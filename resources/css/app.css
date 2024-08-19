@@ -1,0 +1,21 @@
+#botao {
+    background-color: #3994cc;
+    border-color: #3994cc;
+    border-radius: 0%;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    width: auto;
+}
+
+#botao:hover {
+    background-color: #145b86;
+    border-color: #3994cc;
+    margin: 0px, 0px, 0px, 0px;
+}
+
+.vertical-divider {
+    border-left: 1px solid white;
+    height: 15px;
+    margin: 0px, 0px, 0px, 0px;
+    display: inline-block;
+}

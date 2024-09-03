@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Mensagem;
 use App\Models\Chat;
+use App\Events\MensagemEnviada;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -39,6 +40,9 @@ class MensagemController extends Controller
 
             $chat = Chat::find($validatedData['chat_id']);
             $chat->update(['chat_status' => 'Aberto']);
+
+            // Emitir evento via WebSocket
+            broadcast(new MensagemEnviada($mensagem))->toOthers();
 
             return response()->json($mensagem, 201); // 201 Created
         } catch (\Exception $e) {

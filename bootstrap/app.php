@@ -11,7 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->validateCsrfTokens(except: [
+            // Adicione suas rotas específicas para desabilitar a proteção CSRF aqui
+            'stripe/*',
+            'api/teste-conexao',
+            'api'
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

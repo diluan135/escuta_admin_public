@@ -1,6 +1,22 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import axios from 'axios';
+import Echo from "laravel-echo";
+import Pusher from "pusher-js";
+
+// Configuração do Pusher e Echo
+window.Pusher = Pusher;
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: import.meta.env.VITE_PUSHER_APP_KEY, // Use import.meta.env para acessar variáveis de ambiente no Vite
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER, // O cluster
+    wsHost: import.meta.env.VITE_PUSHER_HOST || '127.0.0.1',
+    wsPort: import.meta.env.VITE_PUSHER_PORT || 6001,
+    forceTLS: import.meta.env.VITE_PUSHER_SCHEME === 'https',
+    disableStats: true,
+    enabledTransports: ['ws'], // Use WebSocket
+});
+
 
 export default {
     data() {
@@ -14,22 +30,29 @@ export default {
     },
     computed: {
         ...mapState(['chatsAbertos', 'user']),
-        idServidor(){
+        idServidor() {
             return window.idServidor;
         }
     },
     methods: {
         ...mapActions(['fetchChatsAbertos']),
         async getMessage(chat_id) {
-            const response = await axios.get('/api/mensagem', {
-                params: {
-                    chat_id: chat_id,
-                }
+            try {
+                const response = await axios.get('/api/mensagem', {
+                    params: { chat_id: chat_id },
+                });
+                this.mensagens = response.data;
+                this.chatSelecionado = chat_id;
+
+                // Reconfigura o canal para o chat selecionado
+                window.Echo.channel('chat.' + chat_id)
+                    .listen('MensagemEnviada', (event) => {
+                        console.log('Mensagem recebida:', event.mensagem);
+                        this.mensagens.push(event.mensagem);
+                    });
+            } catch (error) {
+                console.error('Erro ao buscar mensagens:', error);
             }
-            )
-            console.log(response)
-            this.mensagens = response.data
-            this.chatSelecionado = chat_id
         },
         async mandarMensagem() {
             if (!this.chatSelecionado) {
@@ -73,9 +96,32 @@ export default {
         },
     },
     mounted() {
+
+
         this.fetchChatsAbertos();
-        console.log(this.chatsAbertos);
-        console.log(idServidor);
+        console.log('chegou aq');
+        const tokenCSRF = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        console.log('Token CSRF:', tokenCSRF);
+        window.Echo.channel('chat.' + this.chatSelecionado)
+            .listen('MensagemEnviada', (event) => {
+                console.log('Mensagem recebida:', event.mensagem);
+                this.mensagens.push(event.mensagem);
+            });
+
+        // Disparar o evento de teste assim que o componente é montado
+        axios.post('/api/teste-conexao', {
+            mensagem: 'Conexão estabelecida em ' + (import.meta.env.VITE_APP_NAME || 'Desconhecido')
+        }).then(response => {
+            console.log('Evento de conexão enviado:', response.data);
+        }).catch(error => {
+            console.error('Erro ao enviar evento de conexão:', error);
+        });
+
+        // Listener para o evento TesteDeConexao
+        window.Echo.channel('public')
+            .listen('.TesteDeConexao', (event) => {
+                console.log('Mensagem recebida:', event.mensagem);
+            });
     },
 };
 </script>

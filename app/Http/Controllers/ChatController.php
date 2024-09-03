@@ -23,7 +23,7 @@ class ChatController extends Controller
 
     public function fechado(Request $request)
     {   
-        $data = DB::table('chats')->where('chat_status', 'Fechado')->get();            //DEIXAR TUDO EM DB TABLE
+        $data = Chat::where('chat_status', 'Fechado')->get();            //DEIXAR TUDO EM DB TABLE
         return response()->json($data);
     }
 

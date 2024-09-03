@@ -48,6 +48,8 @@ export default {
                 <div class="vertical-divider"></div>
                 <button id="botao" class="btn btn-primary" @click="setCurrentView('Fechado')">FECHADO</button>
                 <div class="vertical-divider"></div>
+                <button id="botao" class="btn btn-primary" @click="setCurrentView('FAQ')">FAQ</button>
+                <div class="vertical-divider"></div>
                 <button id="botao" class="btn btn-primary" @click="setCurrentView('Enquete')">ADICIONAR ENQUETE</button>
                 <div class="vertical-divider"></div>
                 <!-- Exibe o nome do usuário e botão de logout -->

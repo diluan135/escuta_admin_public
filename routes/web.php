@@ -7,11 +7,32 @@ use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LinhasController;
 use App\Http\Controllers\MensagemController;
+use App\Http\Controllers\TestController;
+use App\Events\TesteDeConexao;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+
+Route::middleware(['web'])->post('/test', function (Request $request) {
+    Log::info('CSRF Token Test', ['token' => $request->header('X-CSRF-TOKEN')]);
+    return response()->json(['status' => 'CSRF token test passed']);
+});
+
+
+
+Route::post('/api/teste-conexao', function (Request $request) {
+    $mensagem = $request->input('mensagem', 'Mensagem padrão');
+    event(new TesteDeConexao($mensagem));
+    return response()->json(['status' => 'Evento de conexão enviado']);
+});
+
 
 // ------------------------------------------- OUTRAS ROTAS -----------------------------------------------------
 
 Route::get('/', [HomeController::class, 'index'])->name('home');    //Redireciona para home
 Route::get('api/linhas', [LinhasController::class, 'index']);       //Puxa as linhas (Utiliza outra BD)
+Route::post('/api/test-event', [TestController::class, 'sendEvent']);
+
 
 // ------------------------------------------- ROTAS DE ENQUETES -----------------------------------------------------
 

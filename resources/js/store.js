@@ -51,7 +51,7 @@ export default createStore({
         },
         async fetchChats({ commit }) {            
             try {
-                console.log('aaaaaaaaaaa');
+                // console.log('aaaaaaaaaaa');
                 
                 const response = await axios.get('/api/chat');
                 commit('setChats', response.data);
@@ -60,26 +60,26 @@ export default createStore({
             }
         },
         async fetchChatsAbertos({ commit }) {            
-            console.log('aaaaaaaaaaa');
+            // console.log('aaaaaaaaaaa');
             
             try {
                 const response = await axios.get('/api/chat/abertos');
                 commit('setChatsAbertos', response.data);
             } catch (error) {
-                console.error('Failed to fetch chats', error);
+                console.error('Failed to fetch chats abertos', error);
             }
         },
         async fetchChatsFechados({ commit }) {            
-            console.log('aaaaaaaaaaa');
+            // console.log('aaaaaaaaaaa');
             try {
                 const response = await axios.get('/api/chat/fechados');
                 commit('setChatsFechados', response.data);
             } catch (error) {
-                console.error('Failed to fetch chats', error);
+                console.error('Failed to fetch chats fechados', error);
             }
         },
         async fetchEnquetes({ commit }) {
-            console.log('aaaaaaaaaaa');
+            // console.log('aaaaaaaaaaa');
             try {
                 const response = await axios.get('/api/enquetes');
                 commit('setEnquetes', response.data);

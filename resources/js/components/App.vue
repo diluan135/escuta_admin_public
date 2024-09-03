@@ -7,6 +7,7 @@ import Aberto from './Aberto.vue';
 import Enquete from './Enquete.vue';
 import Fechado from './Fechado.vue';
 import Logout from './Logout.vue';
+import FAQ from './FAQ.vue';
 
 export default {
     components: { Barra },
@@ -26,6 +27,8 @@ export default {
                     return Fechado;
                 case 'Logout':
                     return Logout;
+                case 'FAQ':
+                    return FAQ;
                 default:
                     return Painel; 
             }

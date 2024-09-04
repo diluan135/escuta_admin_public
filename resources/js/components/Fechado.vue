@@ -9,12 +9,14 @@ export default {
             novaMensagem: '',
             chatSelecionado: null,
             loading: false,
+            avisoPublicar: false,
+            editarMensagens: false,
+            publicarStatus: [], // Armazena o estado de publicação para cada mensagem
         }
-
     },
     computed: {
         ...mapState(['chatsFechados', 'user']),
-        idServidor(){
+        idServidor() {
             return window.idServidor;
         }
     },
@@ -25,11 +27,11 @@ export default {
                 params: {
                     chat_id: chat_id,
                 }
-            }
-            )
-            console.log(response)
-            this.mensagens = response.data
-            this.chatSelecionado = chat_id
+            });
+            console.log(response);
+            this.mensagens = response.data;
+            this.chatSelecionado = chat_id;
+            this.publicarStatus = this.mensagens.map(() => true); // Predefine como publicável (true) para todas as mensagens
         },
         async mandarMensagem() {
             if (!this.chatSelecionado) {
@@ -54,28 +56,51 @@ export default {
                 this.loading = false;
             }
         },
-        async fecharChat() {
+        modoPublicarChat() {
             if (!this.chatSelecionado) {
                 console.error('Nenhum chat selecionado.');
                 return;
             }
+            this.editarMensagens = true; // Ativa o modo de edição
+            this.avisoPublicar = true;
+        },
+        async publicarChat() {
+            const mensagensPublicaveis = this.mensagens.map((mensagem, index) => {
+                const mensagemPublicada = {
+                    admin_id: mensagem.admin_id,
+                    mensagem: this.publicarStatus[index] ? mensagem.mensagem : '',
+                };
+
+                console.log("Mensagem Publicável:", mensagemPublicada);
+
+                return mensagemPublicada;
+            });
 
             try {
-                const response = await axios.post('/api/chat/fecharChat', {
+                console.log("Mensagens a serem publicadas:", mensagensPublicaveis);
+
+                const response = await axios.post('/api/chat/publicarChat', {
                     chat_id: this.chatSelecionado,
-                },
-                );
-                console.log('Chat fechado:', response.data);
+                    mensagens: mensagensPublicaveis,
+                });
+
+                console.log('Chat publicado:', response.data);
                 this.chatSelecionado = null;
+                this.editarMensagens = false; // Desativa o modo de edição após a publicação
+                this.avisoPublicar = false;
             } catch (error) {
-                console.error('Erro ao fechar chat:', error);
+                console.error('Erro ao publicar chat:', error);
             }
         },
+
+        cancelarPublicarChat() {
+            this.avisoPublicar = false;
+            this.editarMensagens = false; // Desativa o modo de edição
+        }
     },
     mounted() {
         this.fetchChatsFechados();
-        console.log(this.chatsFechados);
-        console.log(idServidor);
+        this.avisoPublicar = false;
     },
 };
 </script>
@@ -95,17 +120,51 @@ export default {
                 <br>
             </div>
         </div>
-        <div v-if="mensagens.length" class="col-8">
-            <div class="row justify-content-end">
-                <button @click="fecharChat()" class="col-2" :disabled="loading">Fechar chat</button>
+        <div class="col-8">
+            <div class="row" v-if="this.avisoPublicar">
+                <p>Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas
+                    e/ou palavras erradas e de baixo calão!</p>
             </div>
-            <div v-for="mensagem in mensagens" :key="mensagem.id">
-                <span>{{ mensagem }}</span>
-                <span>CHAT ID: {{ mensagem.chat_id }}</span>
+            <div v-else>
+                <div v-if="mensagens.length" class="row justify-content-end">
+                    <button @click="modoPublicarChat()" class="col-2" :disabled="loading">Tornar chat público</button>
+                </div>
             </div>
             <div class="row">
-                <input class="col-8" type="text" v-model="novaMensagem">
-                <button @click="mandarMensagem()" class="col" :disabled="loading">Enviar mensagem</button>
+                <div v-if="mensagens.length" class="col-8">
+
+                    <div v-for="(mensagem, index) in mensagens" :key="mensagem.id">
+                        <div v-if="editarMensagens">
+                            <span v-if="mensagem.usuario_id"> Usuário: </span>
+                            <span v-if="mensagem.admin_id"> Admin:{{ mensagem.admin_id }}</span>
+                            <input v-model="mensagem.mensagem" />
+                            <label>
+                                Publicar
+                                <input type="checkbox" v-model="publicarStatus[index]" checked />
+                            </label>
+                        </div>
+                        <div v-else>
+                            <span v-if="mensagem.usuario_id"> ( Usuário:{{ mensagem.usuario_id }} ) diz: {{
+                                mensagem.mensagem }}</span>
+                            <br>
+                            <span v-if="mensagem.admin_id"> ( Admin:{{ mensagem.admin_id }} ) diz: {{ mensagem.mensagem
+                                }}</span>
+                        </div>
+                    </div>
+
+                    <div v-if="this.avisoPublicar" class="row">
+                        <div class="col text-end">
+                            <button style="margin-right: 10px;" @click="cancelarPublicarChat()" class="col-2"
+                                :disabled="loading">Cancelar</button>
+                            <button @click="publicarChat()" class="col-2" :disabled="loading">Publicar
+                                mensagens</button>
+                        </div>
+                    </div>
+                    <div v-else class="row">
+                        <input class="col-8" type="text" v-model="novaMensagem">
+                        <button @click="mandarMensagem()" class="col" :disabled="loading">Enviar mensagem</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -9,16 +9,18 @@ use App\Http\Controllers\LinhasController;
 use App\Http\Controllers\MensagemController;
 use App\Http\Controllers\TestController;
 use App\Events\TesteDeConexao;
+use App\Http\Controllers\FAQController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+
+
+// ------------------------------------------- WEBSOCKETS -----------------------------------------------------
 
 
 Route::middleware(['web'])->post('/test', function (Request $request) {
     Log::info('CSRF Token Test', ['token' => $request->header('X-CSRF-TOKEN')]);
     return response()->json(['status' => 'CSRF token test passed']);
 });
-
-
 
 Route::post('/api/teste-conexao', function (Request $request) {
     $mensagem = $request->input('mensagem', 'Mensagem padrão');
@@ -51,17 +53,6 @@ Route::post('/api/mensagem/enviarMensagem', [MensagemController::class, 'enviarM
 Route::get('/api/mensagem', [MensagemController::class, 'index']);
 
 
-// ------------------------------------------- EXCLUIR ANTES DE UPAR -----------------------------------------------------
+// ------------------------------------------- ROTAS DE FAQ -----------------------------------------------------
 
-// Route::middleware('auth')->get('/api/user', function () {
-// });
-
-// ------------------------------------------- ROTAS DE LOGIN -----------------------------------------------------
-
-// Route::controller(LoginController::class)->group(function () {
-//     Route::get('/login', 'index')->name('login.index');
-//     Route::post('/login', 'store')->name('login.store');
-//     Route::post('/logout', 'destroy')->name('login.destroy');
-//     Route::get('/registro', 'showRegistroForm')->name('login.registro.form'); // Adiciona esta rota para exibir o formulário
-//     Route::post('/registro', 'registro')->name('login.registro');
-// });
+Route::post('/api/FAQ/publicarChat', [FAQController::class, 'publicarChat']);

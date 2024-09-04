@@ -9,6 +9,17 @@ use Illuminate\Http\Request;
 
 class FAQController extends Controller
 {
+    public function index()
+    {
+        $response = ChatPublicar::where('publicado', '1')->get();
+        return response()->json($response);
+    }
+
+    public function getMensagensPublicadas(Request $request){
+        $response = MensagemPublicar::where('chatPublicado_id', $request->input('id'))->get();
+        return response()->json($response);
+    }
+
     public function publicarChat(Request $request)
     {
 

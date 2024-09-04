@@ -55,4 +55,6 @@ Route::get('/api/mensagem', [MensagemController::class, 'index']);
 
 // ------------------------------------------- ROTAS DE FAQ -----------------------------------------------------
 
+Route::get('/api/FAQ', [FAQController::class, 'index']);
+Route::get('/api/FAQ/mensagensPublicadas', [FAQController::class, 'getMensagensPublicadas']);
 Route::post('/api/FAQ/publicarChat', [FAQController::class, 'publicarChat']);

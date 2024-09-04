@@ -11,6 +11,7 @@ export default createStore({
             chatsAbertos: [],
             chatsFechados: [],
             enquetes: [],
+            faq: [],
         };
     },
     mutations: {
@@ -32,6 +33,9 @@ export default createStore({
         setEnquetes(state, enquetes) {
             state.enquetes = enquetes;
         },
+        setFAQ(state, faq) {
+            state.faq = faq;
+        },
     },
     actions: {
         async fetchData({ commit, dispatch }) {
@@ -51,8 +55,6 @@ export default createStore({
         },
         async fetchChats({ commit }) {            
             try {
-                // console.log('aaaaaaaaaaa');
-                
                 const response = await axios.get('/api/chat');
                 commit('setChats', response.data);
             } catch (error) {
@@ -60,7 +62,7 @@ export default createStore({
             }
         },
         async fetchChatsAbertos({ commit }) {            
-            // console.log('aaaaaaaaaaa');
+
             
             try {
                 const response = await axios.get('/api/chat/abertos');
@@ -70,7 +72,7 @@ export default createStore({
             }
         },
         async fetchChatsFechados({ commit }) {            
-            // console.log('aaaaaaaaaaa');
+
             try {
                 const response = await axios.get('/api/chat/fechados');
                 commit('setChatsFechados', response.data);
@@ -79,12 +81,21 @@ export default createStore({
             }
         },
         async fetchEnquetes({ commit }) {
-            // console.log('aaaaaaaaaaa');
+
             try {
                 const response = await axios.get('/api/enquetes');
                 commit('setEnquetes', response.data);
             } catch (error) {
                 console.error('Failed to fetch enquetes', error);
+            }
+        },
+        async fetchFAQ({ commit }) {
+            try {
+                const response = await axios.get('/api/FAQ'); // Ajuste o endpoint conforme necessário
+                commit('setFAQ', response.data);
+                console.log(response)
+            } catch (error) {
+                console.error('Failed to fetch FAQ', error);
             }
         },
     },

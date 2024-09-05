@@ -23,7 +23,7 @@ export default {
         ...mapActions(['fetchFAQ']),
         async getMensagensFAQ(chat) {
             console.log('entrou');
-            
+
             try {
                 const response = await axios.get('/api/FAQ/mensagensPublicadas', {
                     params: { chat_id: chat.id }
@@ -32,12 +32,12 @@ export default {
                 this.chatSelecionado = chat.id;
                 this.publicarStatus = this.mensagensFAQ.map(mensagem => mensagem.publicado === 1);
                 console.log(response);
-                
+
             } catch (error) {
                 console.error('Erro ao obter mensagens do FAQ:', error);
             }
             console.log('saiu');
-            
+
         },
         modoEditarMensagens() {
             this.editarMensagens = true;
@@ -57,14 +57,24 @@ export default {
             }));
 
             try {
-                await axios.post('/api/FAQ/publicarMensagens', {
+                const response = await axios.post('/api/FAQ/publicarMensagens', {
                     tipo: this.chatTipo,
                     assunto: this.chatAssunto,
                     linha: this.chatLinha,
                     mensagens: mensagensPublicaveis,
+                    chat_id: this.chatSelecionado,
                 });
+
+                // Exibir mensagem de sucesso (opcional)
+                console.log(response.data.message);
             } catch (error) {
-                console.error('Erro ao publicar mensagens do FAQ:', error);
+                // Se o erro vier do back-end, exibe a mensagem apropriada
+                if (error.response && error.response.status === 400) {
+                    console.error('Erro:', error.response.data.message);
+                    alert(error.response.data.message); // Exibe a mensagem de erro para o usuário
+                } else {
+                    console.error('Erro ao publicar mensagens do FAQ:', error);
+                }
             } finally {
                 this.loading = false;
                 this.editarMensagens = false; // Desativa o modo de edição
@@ -75,9 +85,7 @@ export default {
         },
     },
     mounted() {
-        this.fetchFAQ().then(() => {
-            this.faqChats = this.$store.state.faq;
-        });
+        this.fetchFAQ()
     }
 };
 </script>
@@ -87,7 +95,7 @@ export default {
     <div class="d-flex">
         <div class="col-4">
             <h1>Chats do FAQ</h1>
-            <div v-for="chat in faqChats" :key="chat.id">
+            <div v-for="chat in faq" :key="chat.id">
                 <div>{{ chat.assunto }}</div>
                 <div>{{ chat.criado_em }}</div>
                 <div v-if="chat.linha">{{ chat.linha }}</div>

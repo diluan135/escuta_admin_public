@@ -47,7 +47,8 @@ export default createStore({
                 dispatch('fetchChats'),
                 dispatch('fetchChatsAbertos'),
                 dispatch('fetchChatsFechados'),
-                dispatch('fetchEnquetes')
+                dispatch('fetchEnquetes'),
+                dispatch('fetchFAQ'),
             ]);
 
             // Finaliza o estado de carregamento

@@ -35,7 +35,6 @@ export default {
             this.chatAssunto = chat.assunto;
             this.chatLinha = chat.linha;
             this.publicarStatus = this.mensagens.map(() => true);  // Inicializa com todas as mensagens publicáveis
-            console.log(this.chatSelecionado, this.chatTipo, this.chatAssunto, this.chatLinha);
 
         },
         async mandarMensagem() {
@@ -75,22 +74,24 @@ export default {
             }
 
             this.loading = true;
+            console.log(this.chatSelecionado, this.chatTipo, this.chatAssunto, this.chatLinha);
 
             const mensagensPublicaveis = this.mensagens.map((mensagem, index) => ({
                 admin_id: mensagem.admin_id,
                 mensagem: mensagem.mensagem,
                 publicado: this.publicarStatus[index] ? 1 : 0,
             }));
-
+            
             try {
                 await axios.post('/api/FAQ/publicarChat', {
+                    chat_id: this.chatSelecionado,
                     tipo: this.chatTipo,
                     assunto: this.chatAssunto,
                     linha: this.chatLinha,
                     mensagens: mensagensPublicaveis,
                 });
 
-                
+                await this.$store.dispatch('fetchFAQ');
             } catch (error) {
                 console.error('Erro ao publicar chat:', error);
                 this.chatSelecionado = null;

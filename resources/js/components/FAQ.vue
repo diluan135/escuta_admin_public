@@ -8,9 +8,13 @@ export default {
             faqChats: [], // Armazena os chats do FAQ
             mensagensFAQ: [], // Armazena as mensagens do FAQ
             chatSelecionado: null,
+            chatTipo: null,
+            chatAssunto: null,
+            chatLinha: null,
             loading: false,
             editarMensagens: false, // Controle do modo de edição
             publicarStatus: [], // Armazena o status de publicação das mensagens
+            avisoPublicar: false, // Aviso para verificar as mensagens antes de publicar
         };
     },
     computed: {
@@ -30,17 +34,43 @@ export default {
                 });
                 this.mensagensFAQ = response.data;
                 this.chatSelecionado = chat.id;
-                this.publicarStatus = this.mensagensFAQ.map(mensagem => mensagem.publicado === 1);
+                this.chatTipo = chat.tipo;
+                this.chatAssunto = chat.assunto;
+                this.chatLinha = chat.linha;
+                this.publicarStatus = this.mensagensFAQ.map(() => true); // Inicializa com todas as mensagens publicáveis
                 console.log(response);
-
             } catch (error) {
                 console.error('Erro ao obter mensagens do FAQ:', error);
             }
-            console.log('saiu');
-
         },
-        modoEditarMensagens() {
-            this.editarMensagens = true;
+        modoPublicarChat() {
+            if (!this.chatSelecionado) {
+                console.error('Nenhum chat selecionado.');
+                return;
+            }
+            this.avisoPublicar = true;
+            this.editarMensagens = true; // Ativa o modo de edição
+        },
+        editarTitulo(tituloAtual) {
+            // Solicita um novo título ao usuário
+            const novoTitulo = prompt('Insira o novo título do chat:', tituloAtual);
+
+            // Se o usuário inserir um novo título, faz a atualização
+            if (novoTitulo && novoTitulo !== tituloAtual) {
+                this.chatAssunto = novoTitulo; // Atualiza o título localmente
+
+                // Envia uma requisição para atualizar o título no backend
+                axios.post('/api/FAQ/editarTitulo', {
+                    chat_id: this.chatSelecionado,
+                    novo_titulo: novoTitulo
+                })
+                    .then(response => {
+                        console.log('Título atualizado com sucesso:', response.data.message);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar o título:', error);
+                    });
+            }
         },
         async publicarMensagensFAQ() {
             if (!this.chatSelecionado) {
@@ -65,10 +95,9 @@ export default {
                     chat_id: this.chatSelecionado,
                 });
 
-                // Exibir mensagem de sucesso (opcional)
                 console.log(response.data.message);
+                await this.$store.dispatch('fetchFAQ');
             } catch (error) {
-                // Se o erro vier do back-end, exibe a mensagem apropriada
                 if (error.response && error.response.status === 400) {
                     console.error('Erro:', error.response.data.message);
                     alert(error.response.data.message); // Exibe a mensagem de erro para o usuário
@@ -78,14 +107,16 @@ export default {
             } finally {
                 this.loading = false;
                 this.editarMensagens = false; // Desativa o modo de edição
+                this.avisoPublicar = false;
             }
         },
-        cancelarEdicaoFAQ() {
+        cancelarPublicarChat() {
+            this.avisoPublicar = false;
             this.editarMensagens = false; // Desativa o modo de edição
         },
     },
     mounted() {
-        this.fetchFAQ()
+        this.fetchFAQ();
     }
 };
 </script>
@@ -105,36 +136,38 @@ export default {
             </div>
         </div>
         <div v-if="chatSelecionado" class="col-8">
-            <div v-if="editarMensagens">
-                <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id">
-                    <input v-model="mensagem.mensagem" class="form-control" />
-                    <label>
-                        Publicar
-                        <input type="checkbox" v-model="publicarStatus[index]" />
-                    </label>
-                </div>
-                <div class="row">
-                    <div class="col text-end">
-                        <button @click="cancelarEdicaoFAQ()" class="col-2" :disabled="loading">Cancelar</button>
-                        <button @click="publicarMensagensFAQ()" class="col-2" :disabled="loading">Publicar
-                            mensagens</button>
-                    </div>
-                </div>
+            <div v-if="avisoPublicar" class="row">
+                <p>Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas e/ou palavras erradas e de
+                    baixo calão!</p>
             </div>
             <div v-else>
-                <div v-if="mensagensFAQ.length">
+                <div v-if="mensagensFAQ.length" class="row justify-content-end">
+                    <h2 class="col">{{ this.chatAssunto }}</h2>
+                    <button class="col-2" @click="editarTitulo(this.chatAssunto)">Editar título</button>
+                    <button @click="modoPublicarChat()" class="col-2" :disabled="loading">Editar chat</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
                     <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id">
-                        (Admin:{{ mensagem.admin_id }}) diz: {{ mensagem.mensagem }}
-                        <div v-if="mensagem.publicado === 0">
+                        <span v-if="!editarMensagens">
+                            (Admin:{{ mensagem.admin_id }}) diz: {{ mensagem.mensagem }}
+                        </span>
+                        <div v-else>
+                            <input v-model="mensagem.mensagem" class="form-control" />
                             <label>
-                                Editar
-                                <button @click="modoEditarMensagens()" class="btn btn-secondary">Editar</button>
+                                Publicar
+                                <input type="checkbox" v-model="publicarStatus[index]" checked />
                             </label>
                         </div>
                     </div>
-                </div>
-                <div v-else>
-                    <p>Selecione um chat para visualizar as mensagens.</p>
+                    <div v-if="editarMensagens" class="row">
+                        <div class="col text-end">
+                            <button @click="cancelarPublicarChat()" class="col-2" :disabled="loading">Cancelar</button>
+                            <button @click="publicarMensagensFAQ()" class="col-2" :disabled="loading">Publicar
+                                mensagens</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

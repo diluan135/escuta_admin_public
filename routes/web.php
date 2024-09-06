@@ -58,3 +58,5 @@ Route::get('/api/mensagem', [MensagemController::class, 'index']);
 Route::get('/api/FAQ', [FAQController::class, 'index']);
 Route::get('/api/FAQ/mensagensPublicadas', [FAQController::class, 'getMensagensPublicadas']);
 Route::post('/api/FAQ/publicarChat', [FAQController::class, 'publicarChat']);
+Route::post('/api/FAQ/editarTitulo', [FAQController::class, 'atualizarTitulo']);
+Route::post('/FAQ/atualizarMensagens', [FAQController::class, 'atualizarMensagens']);

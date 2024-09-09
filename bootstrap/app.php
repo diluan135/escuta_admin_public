@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Adicione suas rotas específicas para desabilitar a proteção CSRF aqui
             'stripe/*',
             'api/teste-conexao',
-            'api'
+            'api/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -55,16 +55,21 @@ class FAQController extends Controller
         return response()->json(['message' => 'Chat publicado com sucesso!']);
     }
 
+    public function ativarChat(Request $request){
+        ChatPublicar::where('id', $request->input('chat_id'))->update(['publicado' => 1]);
+        return response()->json(['message' => 'Chat ativado com sucesso']);
+    }
+
+    public function desativarChat(Request $request){
+        ChatPublicar::where('id', $request->input('chat_id'))->update(['publicado' => 0]);
+        return response()->json(['message' => 'Chat desativado com sucesso!']);
+    }
+
+
     public function atualizarTitulo(Request $request)
     {
-        // Valida a requisição para garantir que 'chat_id' e 'novo_titulo' estejam presentes
-        $request->validate([
-            'chat_id' => 'required|exists:chatPublicado,chat_id',
-            'novo_titulo' => 'required|string|max:255',
-        ]);
 
-        // Busca o chat publicado pelo 'chat_id'
-        $chatPublicado = ChatPublicar::where('chat_id', $request->input('chat_id'))->first();
+        $chatPublicado = ChatPublicar::where('id', $request->input('chat_id'))->first();
 
         if ($chatPublicado) {
             // Atualiza o título (assunto) do chat

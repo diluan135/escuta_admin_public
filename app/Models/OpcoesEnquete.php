@@ -12,6 +12,7 @@ class OpcoesEnquete extends Model
     protected $fillable = [
         'enquete_id',
         'opcao',
+        'cor'
     ];
 
     public $timestamps = false;

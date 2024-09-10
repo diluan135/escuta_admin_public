@@ -88,6 +88,8 @@ export default {
             }
             this.editarTituloAtivo = false; // Desativa o modo de edição do título
             this.fetchFAQ();
+            // davi coloque um balãozinho com notificação que deu certo a alteração do título aqui:
+
 
         },
         cancelarEdicaoTitulo() {
@@ -151,7 +153,12 @@ export default {
                 this.avisoPublicar = false;
             }
             await this.$store.dispatch('fetchFAQ');
+            this.editarMensagens = false;
+            this.chatSelecionado = null;
             this.getMensagensFAQ(this.chatSelecionado);
+
+            // davi coloque um balãozinho com notificação que deu certo a alteração das mensagens aqui:
+            
         },
         cancelarPublicarChat() {
             this.avisoPublicar = false;

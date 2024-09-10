@@ -69,12 +69,12 @@ export default {
                 alert('O título deve ter pelo menos 3 caracteres.');
                 return;
             }
-            
+
             // Se o título for válido, atualiza o título localmente e envia ao backend
             if (this.novoTitulo !== this.chatAssunto) {
                 this.chatAssunto = this.novoTitulo; // Atualiza o título localmente
                 console.log(this.chatSelecionado, this.novoTitulo);
-                
+
                 await axios.post('/api/FAQ/editarTitulo', {
                     chat_id: this.chatSelecionado,
                     novo_titulo: this.novoTitulo
@@ -86,8 +86,9 @@ export default {
                         console.error('Erro ao atualizar o título:', error);
                     });
             }
-
             this.editarTituloAtivo = false; // Desativa o modo de edição do título
+            this.fetchFAQ();
+
         },
         cancelarEdicaoTitulo() {
             this.editarTituloAtivo = false; // Desativa o modo de edição sem salvar
@@ -114,18 +115,20 @@ export default {
                 } catch (error) {
                     console.error('Erro ao atualizar o status do chat:', error);
                 }
+
             }
 
             this.loading = true;
 
             const mensagensPublicaveis = this.mensagensFAQ.map((mensagem, index) => ({
-                admin_id: mensagem.admin_id,
+                id: mensagem.id,
                 mensagem: mensagem.mensagem,
+                chatPublicado_id: this.chatSelecionado,
                 publicado: this.publicarStatus[index] ? 1 : 0,
             }));
 
             try {
-                const response = await axios.post('/api/FAQ/publicarMensagens', {
+                const response = await axios.post('/api/FAQ/atualizarMensagens', {
                     tipo: this.chatTipo,
                     assunto: this.chatAssunto,
                     linha: this.chatLinha,
@@ -134,7 +137,7 @@ export default {
                 });
 
                 console.log(response.data.message);
-                await this.$store.dispatch('fetchFAQ');
+                
             } catch (error) {
                 if (error.response && error.response.status === 400) {
                     console.error('Erro:', error.response.data.message);
@@ -147,6 +150,8 @@ export default {
                 this.editarMensagens = false; // Desativa o modo de edição
                 this.avisoPublicar = false;
             }
+            await this.$store.dispatch('fetchFAQ');
+            this.getMensagensFAQ(this.chatSelecionado);
         },
         cancelarPublicarChat() {
             this.avisoPublicar = false;
@@ -195,8 +200,14 @@ export default {
                 <div class="col-8">
                     <span v-if="!editarMensagens">
                         <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id">
-                            <span v-if="mensagem.admin_id">Admin {{ mensagem.admin_id }}: {{ mensagem.mensagem }}</span>
-                            <span v-else=>Usuário: {{ mensagem.mensagem }}</span>
+                            <div v-if="mensagem.admin_id" class="row">
+                                <span class="col">Admin {{ mensagem.admin_id }}: {{ mensagem.mensagem }}</span>
+                                <span class="col">Publicado? {{ mensagem.publicado }}</span>
+                            </div>
+                            <div v-else class="row">
+                                <span class="col" >Usuário: {{ mensagem.mensagem }}</span>
+                                <span class="col">Publicado? {{ mensagem.publicado }}</span>
+                            </div>
                         </div>
                     </span>
                     <div v-else>
@@ -210,7 +221,7 @@ export default {
                             <input v-model="mensagem.mensagem" class="form-control" />
                             <label>
                                 Publicar
-                                <input type="checkbox" v-model="publicarStatus[index]" checked />
+                                <input type="checkbox" :checked="mensagem.publicado == 1" v-model="publicarStatus[index]" checked />
                             </label>
                         </div>
                     </div>

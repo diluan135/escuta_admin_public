@@ -64,4 +64,4 @@ Route::post('/api/FAQ/desativarChat', [FAQController::class, 'desativarChat']);
 
 Route::post('/api/FAQ/editarTitulo', [FAQController::class, 'atualizarTitulo']);
 
-Route::post('/FAQ/atualizarMensagens', [FAQController::class, 'atualizarMensagens']);
+Route::post('api/FAQ/atualizarMensagens', [FAQController::class, 'atualizarMensagens']);

@@ -55,12 +55,14 @@ class FAQController extends Controller
         return response()->json(['message' => 'Chat publicado com sucesso!']);
     }
 
-    public function ativarChat(Request $request){
+    public function ativarChat(Request $request)
+    {
         ChatPublicar::where('id', $request->input('chat_id'))->update(['publicado' => 1]);
         return response()->json(['message' => 'Chat ativado com sucesso']);
     }
 
-    public function desativarChat(Request $request){
+    public function desativarChat(Request $request)
+    {
         ChatPublicar::where('id', $request->input('chat_id'))->update(['publicado' => 0]);
         return response()->json(['message' => 'Chat desativado com sucesso!']);
     }
@@ -86,22 +88,6 @@ class FAQController extends Controller
 
     public function atualizarMensagens(Request $request)
     {
-        // Valida a requisição para garantir que o 'chat_id' e as 'mensagens' estejam presentes
-        $request->validate([
-            'chat_id' => 'required|exists:chatPublicado,chat_id',
-            'mensagens' => 'required|array',
-            'mensagens.*.id' => 'required|exists:mensagemPublicar,id', // Verifica se cada mensagem existe
-            'mensagens.*.mensagem' => 'required|string',
-            'mensagens.*.publicado' => 'required|boolean',
-        ]);
-
-        // Busca o chat publicado pelo 'chat_id'
-        $chatPublicado = ChatPublicar::where('chat_id', $request->input('chat_id'))->first();
-
-        if (!$chatPublicado) {
-            return response()->json(['message' => 'Chat não encontrado.'], 404);
-        }
-
         // Percorre as mensagens e atualiza cada uma
         foreach ($request->input('mensagens') as $mensagemData) {
             $mensagem = MensagemPublicar::find($mensagemData['id']);

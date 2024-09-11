@@ -66,19 +66,14 @@ export default {
 </script>
 
 <template>
-    <div class="container mt-4">
+    <div class="mt-5 d-flex flex-column align-items-center justify-content-center" >
 
-        <div>
-            <h1 class="lemon-font text-white" style="margin-left: 4rem;">ENQUETES</h1>
-            <div style="margin-left: 1rem;">
-                <p class="text-white m-0">Esta seção é utilizada para criar enquetes, que serão enviadas aos usuários
-                </p>
-                <p class="text-white">do transporte público, possibilitando-os a votar no que os favorecem!</p>
-            </div>
+        <div class="d-flex flex-column justify-content-center align-items-center mb-5">
+            <h1 class="lemon-font text-white m-0">ENQUETES</h1>
         </div>
 
-        <div class="row d-flex flex-column justify-start w-75 p-4"
-            style="background: #141932; border-radius: 1rem; height: 100%;">
+        <div class="row d-flex flex-column justify-start p-4"
+            style="background: #141932; border-radius: 1rem; height: 100%; width: 80vw;">
 
             <div class="d-flex flex-column justify-start gap-3 mb-4 p-0">
                 <input type="text" v-model="titulo" placeholder="Título da enquete" class="my-input w-50">
@@ -102,16 +97,16 @@ export default {
                     </div>
                 </div>
 
-                <div class="col-4 d-flex flex-column align-items-end justify-content-around ">
+                <div class="col-4 d-flex flex-column align-items-end justify-content-start">
                     <span class="text-white" style="margin-right: 0.5rem;">Encerra em:</span>
-                    <input class="my-input w-75" type="datetime-local" v-model="encerra_em">
+                    <input class="my-input" style="width: 55%;" type="datetime-local" v-model="encerra_em">
                 </div>
 
             </div>
 
             <div class="d-flex flex-row justify-content-between">
                 <button @click="numOpcoes++" class="btn btn-link p-0">Adicionar opção</button>
-                <button @click="criarEnquete" class="botao azul ms-auto">Enviar</button>
+                <button @click="criarEnquete" class="botao azul ms-auto" style="margin-right: 0.7rem;">Enviar</button>
             </div>
         </div>
     </div>

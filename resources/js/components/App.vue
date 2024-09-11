@@ -1,7 +1,7 @@
 <script>
 import { mapState, mapMutations, mapActions } from 'vuex';
 import Barra from './Barra.vue';
-import Aguardando from './Aguardando.vue'; 
+import Aguardando from './Aguardando.vue';
 import Painel from './Painel.vue';
 import Aberto from './Aberto.vue';
 import Enquete from './Enquete.vue';
@@ -30,7 +30,7 @@ export default {
                 case 'FAQ':
                     return FAQ;
                 default:
-                    return Painel; 
+                    return Painel;
             }
         },
     },
@@ -47,11 +47,11 @@ export default {
 
 <template>
     <div v-if="loading" class="loading-overlay">
-      <p>Carregando dados...</p>
+        <p>Carregando dados...</p>
     </div>
     <div v-else>
         <Barra></Barra>
-        <div style="height: 100vh; background-color: #eee">
+        <div id="render-principal">
             <component :is="currentViewComponent"></component>
         </div>
     </div>
@@ -59,15 +59,22 @@ export default {
 
 <style>
 .loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.8);
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+}
+
+#render-principal {
+    background: rgb(0, 108, 119);
+    background: linear-gradient(90deg, rgba(0, 108, 119, 1) 10%, rgba(0, 68, 108, 1) 45%, rgba(0, 18, 29, 1) 83%);
+    height: calc(100vh - 5rem);
+    overflow-y: auto;
 }
 </style>

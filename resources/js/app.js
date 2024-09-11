@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import '../css/app.css';
+import '../css/style.css';
 import { createApp } from 'vue';
 import App from './components/App.vue';
 import store from './store';

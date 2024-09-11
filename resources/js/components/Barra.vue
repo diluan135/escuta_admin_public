@@ -34,7 +34,7 @@ export default {
 </script>
 
 <template>
-    <div style="background-color:#3994cc; max-width: 100%;" class="container">
+    <div style="background-color:#141932; max-width: 100%;" class="container">
         <div class="row" style="padding-top: 0px; padding-bottom: 0px;">
             <div class="col d-flex align-items-center text-center">
                 <img style="height:1.5vw; margin-right: 10px; padding-left: 1vw; padding-right: 2vw;"

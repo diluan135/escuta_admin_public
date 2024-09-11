@@ -8,7 +8,7 @@ export default {
             titulo: '',
             descricao: '',
             opcoes: [],
-            numOpcoes: 1,
+            numOpcoes: 2,
             encerra_em: new Date().toISOString().slice(0, 16) // Definindo o valor inicial com o formato correto
         }
     },
@@ -34,7 +34,7 @@ export default {
                     encerra_em: formattedEncerraEm, // Enviando a data formatada
                 });
             } catch (error) {
-                console.error(error);   
+                console.error(error);
             } finally {
                 await this.$store.dispatch('fetchEnquetes');
                 this.titulo = '';
@@ -51,10 +51,9 @@ export default {
             this.opcoes.push({ texto: '', cor: '#ffffff' });
         },
         removerOpcao(index) {
-            if (this.opcoes.length > 1) {
+            if (this.numOpcoes > 2) {
                 this.opcoes.splice(index, 1);
-            } else {
-                alert('Pelo menos uma opção deve ser mantida.');
+                this.numOpcoes--;
             }
         },
     },
@@ -67,22 +66,53 @@ export default {
 </script>
 
 <template>
-    <div>
-        <input type="text" v-model="titulo" placeholder="TITULO">
-        <input type="text" v-model="descricao" placeholder="DESCRICAO">
-        <span>Encerra em:</span>
-        <input type="datetime-local" v-model="encerra_em">
+    <div class="container mt-4">
 
         <div>
-            <div v-for="(opcao, index) in opcoes" :key="index">
-                <input type="text" v-model="opcao.texto" :placeholder="`OPCAO ${index + 1}`">
-                <input type="color" v-model="opcao.cor">
+            <h1 class="lemon-font text-white" style="margin-left: 4rem;">ENQUETES</h1>
+            <div style="margin-left: 1rem;">
+                <p class="text-white m-0">Esta seção é utilizada para criar enquetes, que serão enviadas aos usuários
+                </p>
+                <p class="text-white">do transporte público, possibilitando-os a votar no que os favorecem!</p>
+            </div>
+        </div>
 
-                <button @click="removerOpcao(index)">REMOVER OPCAO</button>
+        <div class="row d-flex flex-column justify-start w-75 p-4"
+            style="background: #141932; border-radius: 1rem; height: 100%;">
+
+            <div class="d-flex flex-column justify-start gap-3 mb-4 p-0">
+                <input type="text" v-model="titulo" placeholder="Título da enquete" class="my-input w-50">
+                <textarea v-model="descricao" placeholder="Descrição..." class="my-input w-100"
+                    style="height: 5rem; resize: none;"></textarea>
             </div>
 
-            <button @click="adicionarOpcao">ADICIONAR OPCAO</button>
-            <button @click="criarEnquete">CRIAR NOVA ENQUETE</button>
+            <div class="row mb-2 p-0">
+
+                <div class="col-8" style="max-height: 5rem; overflow-y: auto;">
+                    <div v-for="(opcao, index) in numOpcoes" :key="index" class="mb-1 position-relative">
+                        <div class="input-wrapper d-flex flex-row gap-3">
+                            <input type="text" v-model="opcoes[index]" :placeholder="`Opção #${index + 1}`"
+                                class="my-input white">        
+                            <button v-if="numOpcoes > 2" @click="removerOpcao(index)" class="remove-btn"
+                                style="margin-right: 3.5rem;">
+                                <i class="fas fa-trash"></i>                               
+                            </button>
+                            <input id="color-input" type="color" v-model="opcao.cor" style="margin-top: 0.3rem;">
+                        </div>                        
+                    </div>
+                </div>
+
+                <div class="col-4 d-flex flex-column align-items-end justify-content-around ">
+                    <span class="text-white" style="margin-right: 0.5rem;">Encerra em:</span>
+                    <input class="my-input w-75" type="datetime-local" v-model="encerra_em">
+                </div>
+
+            </div>
+
+            <div class="d-flex flex-row justify-content-between">
+                <button @click="numOpcoes++" class="btn btn-link p-0">Adicionar opção</button>
+                <button @click="criarEnquete" class="botao azul ms-auto">Enviar</button>
+            </div>
         </div>
     </div>
 </template>

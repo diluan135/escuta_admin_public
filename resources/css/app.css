@@ -1,21 +1,52 @@
 #botao {
-    background-color: #3994cc;
-    border-color: #3994cc;
+    background-color: #141932;
+    border-color: #141932;
     border-radius: 0%;
-    padding-left: 2vw;
-    padding-right: 2vw;
     width: auto;
+    padding: 0, 2vw, 0, 2vw;
+    border: 0px;
+    padding: 1.25vw;
+}
+
+#botao.active {
+    background-color: #002b46;
+    border-color: #141932;
+    margin: 0px, 0px, 0px, 0px;
 }
 
 #botao:hover {
-    background-color: #145b86;
-    border-color: #3994cc;
+    background-color: #002b46;
+    border-color: #141932;
     margin: 0px, 0px, 0px, 0px;
 }
 
 .vertical-divider {
     border-left: 1px solid white;
-    height: 15px;
+    height: 2.5vh;
     margin: 0px, 0px, 0px, 0px;
     display: inline-block;
+}
+
+.custom-dropdown {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.dropdown-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    text-align: left;
+}
+
+.dropdown-toggle .d-flex {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-icon {
+    margin-left: auto;
 }

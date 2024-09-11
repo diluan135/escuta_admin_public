@@ -1,0 +1,296 @@
+@font-face {
+    font-family: 'lemon-milk';
+    src: url('../fonts/LEMONMILK-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.lemon-font {
+    font-family: 'lemon-milk';
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; 
+}
+
+h1, h2 {
+    color: white;
+}
+
+.dynamic-col {
+    transition: width 0.5s;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.conversation-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 4rem;
+}
+
+.body-container {
+    background-image: url('../img/neon-bus3.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: row;
+    caret-color: transparent;
+}
+
+.principal {
+    position: relative;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    margin: 0;
+}
+
+.principal.left {
+    height: 66.67vh;
+    width: calc(80vw * 0.3125);
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 30px 0 0 30px;
+}
+
+.principal.right {
+    height: 66.67vh;
+    width: calc(80vw * 0.6875);
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 0 30px 30px 0;
+}
+
+.principal.center {
+    flex-grow: 1;
+    flex-shrink: 1;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 30px 30px 30px 30px;
+    padding: 3rem 12rem 3rem 12rem;
+}
+
+.ul-error {
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    border-radius: 15px;
+}
+
+.li-error {
+    color: #ff2d2d;
+    font-weight: bold;
+    font-family: 'lemon-milk';
+    font-size: 0.8rem;
+}
+
+.li-error::before {
+    content: "• ";
+    font-size: 1.2em;
+}
+
+.input-container {
+    position: relative;
+    width: 20rem;
+}
+
+.my-input {
+    background-color: #003f52;
+    color: white;
+    border-radius: 13px;
+    border: 0 solid #ccc;
+    padding: 0.5rem;
+    width: 100%;
+    padding-left: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 0px 4px rgba(0, 0, 0, 0.5);
+    caret-color: white;
+    outline: none;
+    overflow: hidden;
+}
+
+.my-input.white {
+    background-color: white;
+    color: #003f52;
+    caret-color: #003f52;
+}
+
+.my-input:focus {
+    border: 0 solid transparent;
+    box-shadow: 0 0px 4px rgba(0, 0, 0, 0.5);
+    outline: none;
+}
+
+.my-input:-webkit-autofill {
+    background-color: #003f52 !important;
+    color: white !important;
+    -webkit-box-shadow: 0 0 0px 1000px #003f52 inset !important;
+    box-shadow: 0 0 0px 1000px #003f52 inset !important;
+    -webkit-text-fill-color: white !important;
+    border: 0 solid transparent;
+    outline: none;
+}
+
+.my-input::placeholder {
+    color: white;
+    opacity: 1;
+}
+
+.my-input.white::placeholder {
+    color: #003f52;
+    opacity: 1;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white;
+}
+
+.toggle-password:focus {
+    outline: none;
+}
+
+.botao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 1.25rem;
+    border-radius: 50rem;
+    padding: 1rem;
+    cursor: pointer;
+    width: 14rem;
+    height: 3rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.botao:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+}
+
+.botao.azul {
+    background: linear-gradient(90deg, rgba(0, 212, 255, 1) 0%, rgba(1, 120, 122, 1) 100%, rgba(2, 0, 36, 1) 100%);
+    border: none;
+    color: white;
+}
+
+.botao.branco {
+    text-decoration: none;
+    background: white;
+    color: black;
+    border: none;
+}
+
+.search-bar .form-control {
+    border-right: 0;
+    box-shadow: none;
+}
+
+.search-bar .input-group-text {
+    background-color: white;
+    border-left: 0;
+    color: #141932;
+}
+
+.search-bar .fa-search,
+.search-bar .fa-times {
+    color: #141932;
+}
+
+.chat-container {
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-bottom: 0.5rem;
+}
+
+.message-received {
+    background-color: #e0e0e0;
+    align-self: flex-start;
+    margin-right: auto;
+}
+
+.message-sent {
+    background-color: #141932;
+    color: white;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.message-received,
+.message-sent {
+    max-width: 70%; 
+    border-radius: 15px;
+    overflow-wrap: break-word;
+}
+
+.card-body:hover {
+    background-color: #141932;
+    transition: background-color 0.5s, transform 0.5s ease-in;
+    color: white;
+    cursor: pointer;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #888; /* Cor do ícone */
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    color: #f00; /* Cor do ícone ao passar o mouse */
+}
+
+#color-input { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 2rem;
+    height: 2rem;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#color-input::-webkit-color-swatch {
+    border-radius: 0.3rem;
+    border: none;
+}
+
+#color-input::-moz-color-swatch {
+    border-radius: 0.3rem;
+    border: none;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+}
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}

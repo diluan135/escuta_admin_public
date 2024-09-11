@@ -25,6 +25,7 @@ export default {
             novaMensagem: '',
             chatSelecionado: null,
             loading: false,
+            abriuChat: false,
         }
 
     },
@@ -37,6 +38,7 @@ export default {
     methods: {
         ...mapActions(['fetchChatsAbertos']),
         async getMessage(chat_id) {
+            this.abriuChat = true;
             try {
                 const response = await axios.get('/api/mensagem', {
                     params: { chat_id: chat_id },
@@ -51,6 +53,8 @@ export default {
                         this.mensagens.push(event.mensagem);
                     });
             } catch (error) {
+                this.abriuChat = false;
+                alert('Ocorreu um problema!')
                 console.error('Erro ao buscar mensagens:', error);
             }
         },
@@ -90,6 +94,7 @@ export default {
                 );
                 console.log('Chat fechado:', response.data);
                 this.chatSelecionado = null;
+                this.abriuChat = false;
             } catch (error) {
                 console.error('Erro ao fechar chat:', error);
             }
@@ -127,32 +132,56 @@ export default {
 </script>
 
 <template>
-    <h2>ABERTOOO</h2>
-    <div class="d-flex">
-        <div class="col-4">
-            <h1>Conversas</h1>
-            <div v-for="chat in chatsAbertos " :key="chat.id">
-                <div>{{ chat.assunto }}</div>
-                <div>{{ chat.criado_em }}</div>
-                <div v-if="chat.linha != null">{{ chat.linha }}</div>
-                <div>{{ chat.chat_status }}</div>
-                <button @click="getMessage(chat.id)">Acessar chat</button>
-                <br>
-                <br>
+    <div class="container mt-5 d-flex">
+
+        <div :class="['dynamic-col', { 'col-12': !abriuChat, 'col-4': abriuChat }]">
+
+            <h1 class="text-white lemon-font" style="margin-left: 4rem;">Chats Abertos</h1>
+            <div style="margin-left: 2rem;">
+                <p class="text-white m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                    Lorem Ipsum has been the industry's standard dummy
+                </p>
+                <p class="text-white">Lorem Ipsum has been the industry's standard dummy</p>
+            </div>
+
+            <div class="container">
+                <div class="search-bar input-group">
+                    <input type="text" class="form-control" placeholder="Pesquisar">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <span class="input-group-text"><i class="fas fa-times"></i></span>
+                </div>
+            </div>
+
+            <div class="container mt-4 conversation-list d-flex justify-center flex-column"
+                style="border-radius: 2rem, 0, 2rem, 0;">
+                <div v-for="chat in chatsAbertos " :key="chat.id" class="card border-0 rounded-0 mb-0">
+                    <div class="card-body border-bottom" @click="getMessage(chat.id)">
+                        <h5 class="card-title">{{ chat.assunto }}</h5>
+                        <div v-if="chat.linha != null">{{ chat.linha }}</div>
+                        <p class="mb-0" v-if="chat.linha != null">{{ chat.linha }}</p>
+                        <p class="mb-0">{{ chat.chat_status }}</p>
+                    </div>
+                </div>
             </div>
         </div>
-        <div v-if="mensagens.length" class="col-8">
+
+        <div v-if="mensagens.length" class="col-8 mt-4 px-3 d-flex flex-column" style="height: calc(100vh - 5.5rem);">
+
             <div class="row justify-content-end">
                 <button @click="fecharChat()" class="col-2" :disabled="loading">Fechar chat</button>
             </div>
+
             <div v-for="mensagem in mensagens" :key="mensagem.id">
                 <span>{{ mensagem }}</span>
                 <span>CHAT ID: {{ mensagem.chat_id }}</span>
             </div>
+            
             <div class="row">
                 <input class="col-8" type="text" v-model="novaMensagem">
                 <button @click="mandarMensagem()" class="col" :disabled="loading">Enviar mensagem</button>
             </div>
+
         </div>
+
     </div>
 </template>

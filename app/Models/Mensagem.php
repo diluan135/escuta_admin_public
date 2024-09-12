@@ -18,6 +18,6 @@ class Mensagem extends Model
 
     public $timestamps = false;
 
-    const CREATED_AT = 'enviada_em';
+    const CREATED_AT = 'enviado_em';
 
 }

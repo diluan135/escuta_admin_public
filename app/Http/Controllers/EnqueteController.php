@@ -21,7 +21,7 @@ class EnqueteController extends Controller
     {
         // Criando a enquete e armazenando a instância criada
         $enquete = Enquete::create([
-            'admin_id' => $request['admin_id'],
+            'admin_id' => $request['admin_id'],     
             'titulo' => $request['titulo'],
             'descricao' => $request['descricao'],
             'encerra_em' => $request['encerra_em']

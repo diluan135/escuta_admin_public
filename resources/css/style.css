@@ -243,6 +243,7 @@ h1, h2 {
 
 .card-body:hover {
     background-color: #141932;
+    border-radius: 0.5rem;
     transition: background-color 0.5s, transform 0.5s ease-in;
     color: white;
     cursor: pointer;
@@ -282,6 +283,54 @@ h1, h2 {
 #color-input::-moz-color-swatch {
     border-radius: 0.3rem;
     border: none;
+}
+
+.card-body {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+.alert-secondary {
+    background-color: #1f1f1f;
+}
+
+.alert-dark {
+    background-color: #141932;
+}
+
+.form-control {
+    background-color: #003f52;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
 }
 
 ::-webkit-scrollbar {

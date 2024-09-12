@@ -25,7 +25,6 @@ export default {
             novaMensagem: '',
             chatSelecionado: null,
             loading: false,
-            abriuChat: false,
         }
 
     },
@@ -38,7 +37,6 @@ export default {
     methods: {
         ...mapActions(['fetchChatsAbertos']),
         async getMessage(chat_id) {
-            this.abriuChat = true;
             try {
                 const response = await axios.get('/api/mensagem', {
                     params: { chat_id: chat_id },
@@ -53,8 +51,6 @@ export default {
                         this.mensagens.push(event.mensagem);
                     });
             } catch (error) {
-                this.abriuChat = false;
-                alert('Ocorreu um problema!')
                 console.error('Erro ao buscar mensagens:', error);
             }
         },
@@ -94,7 +90,6 @@ export default {
                 );
                 console.log('Chat fechado:', response.data);
                 this.chatSelecionado = null;
-                this.abriuChat = false;
             } catch (error) {
                 console.error('Erro ao fechar chat:', error);
             }
@@ -132,56 +127,55 @@ export default {
 </script>
 
 <template>
-    <div class="container mt-5 d-flex">
-
-        <div :class="['dynamic-col', { 'col-12': !abriuChat, 'col-4': abriuChat }]">
-
-            <h1 class="text-white lemon-font" style="margin-left: 4rem;">Chats Abertos</h1>
-            <div style="margin-left: 2rem;">
-                <p class="text-white m-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                    Lorem Ipsum has been the industry's standard dummy
-                </p>
-                <p class="text-white">Lorem Ipsum has been the industry's standard dummy</p>
-            </div>
-
-            <div class="container">
-                <div class="search-bar input-group">
-                    <input type="text" class="form-control" placeholder="Pesquisar">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <span class="input-group-text"><i class="fas fa-times"></i></span>
-                </div>
-            </div>
-
-            <div class="container mt-4 conversation-list d-flex justify-center flex-column"
-                style="border-radius: 2rem, 0, 2rem, 0;">
-                <div v-for="chat in chatsAbertos " :key="chat.id" class="card border-0 rounded-0 mb-0">
-                    <div class="card-body border-bottom" @click="getMessage(chat.id)">
+    <div class="row">
+        <!-- Lista de Conversas -->
+        <div class="col-4 p-4 border-end" style="height: calc(100vh - 7rem); background-color: rgba(0, 0, 0, 0.7);">
+            <h1 class="mb-4" style="margin-left: 1rem; color: white;">Conversas</h1>
+            <div style="height: 100%; overflow-y: auto;">
+                <div v-for="chat in chatsAbertos" :key="chat.id" class="card mb-3" style="background-color: rgba(0, 0, 0, 0.5); color: white;">
+                    <div class="card-body">
                         <h5 class="card-title">{{ chat.assunto }}</h5>
-                        <div v-if="chat.linha != null">{{ chat.linha }}</div>
-                        <p class="mb-0" v-if="chat.linha != null">{{ chat.linha }}</p>
-                        <p class="mb-0">{{ chat.chat_status }}</p>
+                        <p class="card-text">
+                            <strong>Criado em:</strong> {{ chat.criado_em }}
+                        </p>
+                        <p v-if="chat.linha != null" class="card-text">
+                            <strong>Linha:</strong> {{ chat.linha }}
+                        </p>
+                        <p class="card-text">
+                            <strong>Status:</strong> {{ chat.chat_status }}
+                        </p>
+                        <button @click="getMessage(chat.id)" class="btn btn-primary btn-sm">Acessar chat</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="mensagens.length" class="col-8 mt-4 px-3 d-flex flex-column" style="height: calc(100vh - 5.5rem);">
-
-            <div class="row justify-content-end">
-                <button @click="fecharChat()" class="col-2" :disabled="loading">Fechar chat</button>
+        <!-- Mensagens do Chat -->
+        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3" style="height: calc(100vh - 3rem); width: 60vw; background-color: rgba(0, 0, 0, 0.7);">
+            <div class="border-bottom pb-3 mb-3" style="border-bottom-color: #fff;">
+                <h3 class="text-white">Chat ativo</h3>
+                <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">Fechar chat</button>
             </div>
 
-            <div v-for="mensagem in mensagens" :key="mensagem.id">
-                <span>{{ mensagem }}</span>
-                <span>CHAT ID: {{ mensagem.chat_id }}</span>
-            </div>
-            
-            <div class="row">
-                <input class="col-8" type="text" v-model="novaMensagem">
-                <button @click="mandarMensagem()" class="col" :disabled="loading">Enviar mensagem</button>
+            <div class="chat-messages flex-grow-1 overflow-auto mb-3">
+                <div v-for="mensagem in mensagens" :key="mensagem.id" class="mb-2">
+                    <div class="alert" :class="{'alert-secondary': mensagem.chat_id % 2 === 0, 'alert-dark': mensagem.chat_id % 2 !== 0}" style="color: white;">
+                        <span>{{ mensagem.mensagem }}</span>
+                        <div class="text-muted small">Chat ID: {{ mensagem.chat_id }}</div>
+                    </div>
+                </div>
             </div>
 
+            <!-- Input para nova mensagem -->
+            <div class="d-flex flex-row" style="width: 80%;">
+                <input class="form-control col-9 me-2 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
+                <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar mensagem</button>
+            </div>
         </div>
 
+        <!-- Placeholder quando nenhum chat está selecionado -->
+        <div v-else class="col-8 d-flex align-items-center justify-content-center h-100" style="background-color: rgba(0, 0, 0, 0.7);">
+            <h1 class="text-white">Acesse um chat para visualizá-lo.</h1>
+        </div>
     </div>
 </template>

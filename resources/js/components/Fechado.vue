@@ -116,54 +116,65 @@ export default {
 </script>
 
 <template>
-    <h2>FECHADO</h2>
     <div class="d-flex">
-        <div class="col-4">
-            <h1>Conversas</h1>
-            <div v-for="chat in chatsFechados" :key="chat.id">
-                <div>{{ chat.assunto }}</div>
-                <div>{{ chat.criado_em }}</div>
-                <div v-if="chat.linha">{{ chat.linha }}</div>
-                <div>{{ chat.chat_status }}</div>
-                <button @click="getMessage(chat)">Acessar chat</button>
-                <br><br>
+        <!-- Lista de Conversas -->
+        <div class="col-4 p-4 border-end" style="background-color: rgba(0, 0, 0, 0.7); height: calc(100vh - 7rem);">
+            <h1 class="mb-4" style="color: white;">Conversas</h1>
+            <div style="height: 100%; overflow-y: auto;">
+                <div v-for="chat in chatsFechados" :key="chat.id" class="card mb-3" style="background-color: rgba(0, 0, 0, 0.5); color: white;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ chat.assunto }}</h5>
+                        <p class="card-text">
+                            <strong>Criado em:</strong> {{ chat.criado_em }}
+                        </p>
+                        <p v-if="chat.linha" class="card-text">
+                            <strong>Linha:</strong> {{ chat.linha }}
+                        </p>
+                        <p class="card-text">
+                            <strong>Status:</strong> {{ chat.chat_status }}
+                        </p>
+                        <button @click="getMessage(chat)" class="btn btn-primary btn-sm">Acessar chat</button>
+                        <br><br>
+                    </div>
+                </div>
             </div>
         </div>
-        <div v-if="this.chatSelecionado" class="col-8">
-            <div v-if="avisoPublicar" class="row">
-                <p>Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas e/ou palavras erradas e de
-                    baixo calão!</p>
+
+        <!-- Mensagens do Chat -->
+        <div v-if="this.chatSelecionado" class="col-8 d-flex flex-column p-3" style="background-color: rgba(0, 0, 0, 0.7); height: calc(100vh - 3rem);">
+            <div v-if="avisoPublicar" class="row mb-3">
+                <p class="text-white">Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas e/ou palavras erradas e de baixo calão!</p>
             </div>
             <div v-else>
                 <div v-if="mensagens.length" class="row justify-content-end">
-                    <button @click="modoPublicarChat()" class="col-2" :disabled="loading">Tornar chat público</button>
+                    <button @click="modoPublicarChat()" class="btn btn-success btn-sm" :disabled="loading">Tornar chat público</button>
                 </div>
             </div>
             <div class="row">
                 <div class="col-8">
-                    <div v-for="(mensagem, index) in mensagens" :key="mensagem.id">
-                        <span v-if="!editarMensagens">
+                    <div v-for="(mensagem, index) in mensagens" :key="mensagem.id" class="mb-2">
+                        <span v-if="!editarMensagens" class="text-white">
                             (Admin:{{ mensagem.admin_id }}) diz: {{ mensagem.mensagem }}
                         </span>
                         <div v-else>
-                            <input v-model="mensagem.mensagem" class="form-control" />
-                            <label>
+                            <input v-model="mensagem.mensagem" class="form-control my-input" />
+                            <label class="text-white">
                                 Publicar
                                 <input type="checkbox" v-model="publicarStatus[index]" checked />
                             </label>
                         </div>
                     </div>
-                    <div v-if="editarMensagens" class="row">
+                    <div v-if="editarMensagens" class="row mb-3">
                         <div class="col text-end">
-                            <button @click="cancelarPublicarChat()" class="col-2" :disabled="loading">Cancelar</button>
-                            <button @click="publicarChat()" class="col-2" :disabled="loading">Publicar
-                                mensagens</button>
+                            <button @click="cancelarPublicarChat()" class="btn btn-danger btn-sm" :disabled="loading">Cancelar</button>
+                            <button @click="publicarChat()" class="btn btn-success btn-sm" :disabled="loading">Publicar mensagens</button>
                         </div>
                     </div>
                     <div v-else class="row">
-                        <input class="col-8" type="text" v-model="novaMensagem">
-                        <button @click="mandarMensagem()" class="col" :disabled="loading">Enviar mensagem</button>
-                        <!-- davi deixa um jeito bonitinho de exibir que não da pra mandar mensagem vazia caso o usuário tente -->
+                        <input class="form-control col-8 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
+                        <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar mensagem</button>
+                        <!-- Dica para mensagem vazia -->
+                        <div v-if="novaMensagem.trim() === ''" class="text-danger mt-2">A mensagem não pode estar vazia.</div>
                     </div>
                 </div>
             </div>

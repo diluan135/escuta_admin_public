@@ -66,7 +66,7 @@ export default {
 </script>
 
 <template>
-    <div class="mt-5 d-flex flex-column align-items-center justify-content-center" >
+    <div class="mt-5 d-flex flex-column align-items-center justify-content-center">
 
         <div class="d-flex flex-column justify-content-center align-items-center mb-5">
             <h1 class="lemon-font text-white m-0">ENQUETES</h1>

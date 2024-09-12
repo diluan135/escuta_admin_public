@@ -172,75 +172,84 @@ export default {
 </script>
 
 <template>
-    <h2>FAQ</h2>
-    <div class="d-flex">
-        <div class="col-4">
-            <h1>Chats do FAQ</h1>
-            <div v-for="chat in faq" :key="chat.id">
-                <div>{{ chat.assunto }}</div>
-                <div>{{ chat.criado_em }}</div>
-                <div v-if="chat.linha">{{ chat.linha }}</div>
-                <div v-if="chat.publicado == 1">Publicado</div>
-                <button @click="getMensagensFAQ(chat)">Acessar mensagens do FAQ</button>
-                <br><br>
-            </div>
-        </div>
-        <div v-if="chatSelecionado" class="col-8">
-            <div v-if="avisoPublicar" class="row">
-                <p>Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas e/ou palavras erradas e de
-                    baixo calão!</p>
-            </div>
-            <div v-else>
-                <div class="row" v-if="!editarTituloAtivo">
-                    <h2 class="col">{{ chatAssunto }}</h2>
-                    <button class="col-2" @click="editarTitulo">Editar título</button>
-                    <button @click="modoPublicarChat()" class="col-2" :disabled="loading">Editar chat</button>
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">FAQ</h2>
+        <div class="row">
+            <!-- Lista de Chats do FAQ -->
+            <div class="col-md-4">
+                <h3 class="mb-4">Chats do FAQ</h3>
+                <div v-for="chat in faq" :key="chat.id" class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ chat.assunto }}</h5>
+                        <p class="card-text">
+                            <strong>Criado em:</strong> {{ chat.criado_em }}<br>
+                            <span v-if="chat.linha"><strong>Linha:</strong> {{ chat.linha }}</span><br>
+                            <span v-if="chat.publicado == 1" class="badge bg-success">Publicado</span>
+                        </p>
+                        <button @click="getMensagensFAQ(chat)" class="btn btn-primary">Acessar mensagens do FAQ</button>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Mensagens do FAQ -->
+            <div v-if="chatSelecionado" class="col-md-8">
+                <div v-if="avisoPublicar" class="alert alert-warning">
+                    Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas e/ou palavras erradas e de baixo calão!
+                </div>
+                
                 <div v-else>
-                    <input v-model="novoTitulo" class="form-control col" placeholder="Digite o novo título">
-                    <button class="col-2" @click="salvarTitulo">Salvar</button>
-                    <button class="col-2" @click="cancelarEdicaoTitulo">Cancelar</button>
+                    <div class="d-flex justify-content-between align-items-center mb-3" v-if="!editarTituloAtivo">
+                        <h2>{{ chatAssunto }}</h2>
+                        <div>
+                            <button class="btn btn-secondary me-2" @click="editarTitulo">Editar título</button>
+                            <button class="btn btn-info" @click="modoPublicarChat()" :disabled="loading">Editar chat</button>
+                        </div>
+                    </div>
+                    <div v-else class="d-flex">
+                        <input v-model="novoTitulo" class="form-control me-2" placeholder="Digite o novo título">
+                        <button class="btn btn-success me-2" @click="salvarTitulo">Salvar</button>
+                        <button class="btn btn-danger" @click="cancelarEdicaoTitulo">Cancelar</button>
+                    </div>
                 </div>
 
-            </div>
-            <div class="row">
-                <div class="col-8">
-                    <span v-if="!editarMensagens">
-                        <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id">
-                            <div v-if="mensagem.admin_id" class="row">
-                                <span class="col">Admin {{ mensagem.admin_id }}: {{ mensagem.mensagem }}</span>
-                                <span class="col">Publicado? {{ mensagem.publicado }}</span>
-                            </div>
-                            <div v-else class="row">
-                                <span class="col" >Usuário: {{ mensagem.mensagem }}</span>
-                                <span class="col">Publicado? {{ mensagem.publicado }}</span>
+                <div class="mt-4">
+                    <div v-if="!editarMensagens">
+                        <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id" class="mb-3">
+                            <div class="card p-3">
+                                <div v-if="mensagem.admin_id" class="d-flex justify-content-between">
+                                    <span><strong>Admin {{ mensagem.admin_id }}:</strong> {{ mensagem.mensagem }}</span>
+                                    <span><strong>Publicado:</strong> {{ mensagem.publicado }}</span>
+                                </div>
+                                <div v-else class="d-flex justify-content-between">
+                                    <span><strong>Usuário:</strong> {{ mensagem.mensagem }}</span>
+                                    <span><strong>Publicado:</strong> {{ mensagem.publicado }}</span>
+                                </div>
                             </div>
                         </div>
-                    </span>
+                    </div>
+                    
                     <div v-else>
-                        <label class="row">
-                            Chat publicado?
-                            <input type="checkbox" :checked="this.chatPublicado == 1"
-                                @change="this.chatPublicadoTemp = !this.chatPublicadoTemp" />
+                        <label class="form-check mb-3">
+                            <input type="checkbox" :checked="chatPublicado == 1" class="form-check-input" @change="chatPublicadoTemp = !chatPublicadoTemp">
+                            <span class="form-check-label">Chat publicado?</span>
                         </label>
-
-                        <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id">
-                            <input v-model="mensagem.mensagem" class="form-control" />
-                            <label>
-                                Publicar
-                                <input type="checkbox" :checked="mensagem.publicado == 1" v-model="publicarStatus[index]" checked />
+                        
+                        <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id" class="mb-3">
+                            <input v-model="mensagem.mensagem" class="form-control mb-2" />
+                            <label class="form-check">
+                                <input type="checkbox" :checked="mensagem.publicado == 1" v-model="publicarStatus[index]" class="form-check-input" />
+                                <span class="form-check-label">Publicar</span>
                             </label>
                         </div>
                     </div>
-                    <div v-if="editarMensagens" class="row">
-                        <div class="col text-end">
-                            <button @click="cancelarPublicarChat()" class="col-2" :disabled="loading">Cancelar</button>
-                            <button @click="publicarMensagensFAQ()" class="col-2" :disabled="loading">Salvar
-                                alterações</button>
-                        </div>
+
+                    <div v-if="editarMensagens" class="d-flex justify-content-end">
+                        <button @click="cancelarPublicarChat()" class="btn btn-danger me-2" :disabled="loading">Cancelar</button>
+                        <button @click="publicarMensagensFAQ()" class="btn btn-success" :disabled="loading">Salvar alterações</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
+

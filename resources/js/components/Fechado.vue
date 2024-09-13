@@ -109,7 +109,7 @@ export default {
     <div class="d-flex">
         <!-- Lista de Conversas Fechadas -->
         <div class="col-4 p-4 border-end" style="height: calc(100vh - 3.5rem); background-color: rgba(0, 0, 0, 0.7);">
-            <h1 class="mb-4">Chats Fechados</h1>
+            <h1 class="mb-4">Chats fechados</h1>
             <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
                 <div v-for="chat in chatsFechados" :key="chat.id" @click="getMessage(chat.id)" class="card" style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
                     <div class="card-body">

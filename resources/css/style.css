@@ -273,6 +273,18 @@ h2 {
     overflow-wrap: break-word;
 }
 
+.message-container {
+    /* Adiciona margem inferior para separar as mensagens */
+    margin-bottom: 1rem;
+}
+
+.alert {
+    /* Garante que o texto não saia do container */
+    overflow-wrap: break-word; /* Quebra palavras longas */
+    word-break: break-word;    /* Quebra palavras longas em novas linhas */
+    padding: 0.75rem 1.25rem;  /* Padding para o container da mensagem */
+}
+
 .card-body:hover {
     background-color: #141932;
     border-radius: 0.5rem;

@@ -25,6 +25,7 @@ export default {
             novaMensagem: '',
             chatSelecionado: null,
             loading: false,
+            loadingstats: 0,
         }
 
     },
@@ -37,6 +38,7 @@ export default {
     methods: {
         ...mapActions(['fetchChatsAbertos']),
         async getMessage(chat_id) {
+            this.loadingstats = 1;
             try {
                 const response = await axios.get('/api/mensagem', {
                     params: { chat_id: chat_id },
@@ -90,6 +92,8 @@ export default {
                 );
                 console.log('Chat fechado:', response.data);
                 this.chatSelecionado = null;
+                this.mensagens = [];
+                this.loadingstats = 0;
             } catch (error) {
                 console.error('Erro ao fechar chat:', error);
             }
@@ -130,9 +134,10 @@ export default {
     <div class="d-flex">
         <!-- Lista de Conversas -->
         <div class="col-4 p-4 border-end" style="height: calc(100vh - 3.5rem); background-color: rgba(0, 0, 0, 0.7);">
-            <h1 class="mb-4">Chats abertos</h1>
+            <h1 class="mb-4 lemon-font">Chats abertos</h1>
             <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
-                <div v-for="chat in chatsAbertos" :key="chat.id" @click="getMessage(chat.id)" class="card" style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
+                <div v-for="chat in chatsAbertos" :key="chat.id" @click="getMessage(chat.id)" class="card"
+                    style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
                     <div class="card-body">
                         <h5 class="card-title">{{ chat.assunto }}</h5>
                         <p class="card-text">
@@ -150,31 +155,42 @@ export default {
         </div>
 
         <!-- Mensagens do Chat -->
-        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3" style="height: calc(100vh - 3.5rem); width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7);">
+        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3"
+            style="height: calc(100vh - 3.5rem); width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7);">
             <div class="border-bottom pb-3 mb-3 d-flex flex-row justify-content-between">
                 <h3 class="text-white">Chat ativo</h3>
-                <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">Fechar chat</button>
+                <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">Encerrar chat</button>
             </div>
 
-            <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column">
-                <div v-for="mensagem in mensagens" :key="mensagem.id">
-                    <div class="alert" :class="{'alert-secondary': mensagem.chat_id % 2 === 0, 'alert-dark': mensagem.chat_id % 2 !== 0}" style="color: white;">
-                        <span>{{ mensagem.mensagem }}</span>
-                        <div class="text-muted small">Chat ID: {{ mensagem.chat_id }}</div>
+            <div class="d-flex flex-column justify-content-between" style="height: 85%;">
+                <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column mb-3">
+                    <div v-for="mensagem in mensagens" :key="mensagem.id" class="message-container">
+                        <div class="alert"
+                            :class="{ 'alert-secondary': mensagem.chat_id % 2 === 0, 'alert-dark': mensagem.chat_id % 2 !== 0 }"
+                            style="color: white;">
+                            <span>{{ mensagem.mensagem }}</span>
+                            <div class="text-muted small">Chat ID: {{ mensagem.chat_id }}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Input para nova mensagem -->
-            <div class="d-flex flex-row justify-content-between" style="width: 100%;">
-                <input class="form-control me-2 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
-                <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar mensagem</button>
+                <!-- Input para nova mensagem -->
+                <div class="d-flex flex-row justify-content-between" style="width: 100%;">
+                    <input class="form-control me-2 my-input" type="text" maxlength="255" v-model="novaMensagem"
+                        placeholder="Digite sua mensagem">
+                    <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar
+                        mensagem</button>
+                </div>
             </div>
         </div>
 
         <!-- Placeholder quando nenhum chat está selecionado -->
-        <div v-else class="col-8 d-flex align-items-center justify-content-center h-100">
-            <h1 class="text-white">Acesse um chat para visualizá-lo.</h1>
+        <div v-else class="col-8 d-flex align-items-center justify-content-center"
+            style="height: calc(100vh - 3.5rem);">
+            <h1 v-if="this.loadingstats == 0" class="text-white">Acesse um chat para visualizá-lo.</h1>
+            <div v-if="this.loadingstats == 1" class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
     </div>
 </template>

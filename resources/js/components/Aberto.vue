@@ -127,12 +127,12 @@ export default {
 </script>
 
 <template>
-    <div class="row">
+    <div class="d-flex">
         <!-- Lista de Conversas -->
-        <div class="col-4 p-4 border-end" style="height: calc(100vh - 7rem); background-color: rgba(0, 0, 0, 0.7);">
-            <h1 class="mb-4" style="margin-left: 1rem; color: white;">Conversas</h1>
-            <div style="height: 100%; overflow-y: auto;">
-                <div v-for="chat in chatsAbertos" :key="chat.id" class="card mb-3" style="background-color: rgba(0, 0, 0, 0.5); color: white;">
+        <div class="col-4 p-4 border-end" style="height: calc(100vh - 3.5rem); background-color: rgba(0, 0, 0, 0.7);">
+            <h1 class="mb-4">Chats abertos</h1>
+            <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
+                <div v-for="chat in chatsAbertos" :key="chat.id" @click="getMessage(chat.id)" class="card" style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
                     <div class="card-body">
                         <h5 class="card-title">{{ chat.assunto }}</h5>
                         <p class="card-text">
@@ -144,21 +144,20 @@ export default {
                         <p class="card-text">
                             <strong>Status:</strong> {{ chat.chat_status }}
                         </p>
-                        <button @click="getMessage(chat.id)" class="btn btn-primary btn-sm">Acessar chat</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Mensagens do Chat -->
-        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3" style="height: calc(100vh - 3rem); width: 60vw; background-color: rgba(0, 0, 0, 0.7);">
-            <div class="border-bottom pb-3 mb-3" style="border-bottom-color: #fff;">
+        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3" style="height: calc(100vh - 3.5rem); width: 66.66%; background-color: rgba(0, 0, 0, 0.7);">
+            <div class="border-bottom pb-3 mb-3 d-flex flex-row justify-content-between">
                 <h3 class="text-white">Chat ativo</h3>
                 <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">Fechar chat</button>
             </div>
 
-            <div class="chat-messages flex-grow-1 overflow-auto mb-3">
-                <div v-for="mensagem in mensagens" :key="mensagem.id" class="mb-2">
+            <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column">
+                <div v-for="mensagem in mensagens" :key="mensagem.id">
                     <div class="alert" :class="{'alert-secondary': mensagem.chat_id % 2 === 0, 'alert-dark': mensagem.chat_id % 2 !== 0}" style="color: white;">
                         <span>{{ mensagem.mensagem }}</span>
                         <div class="text-muted small">Chat ID: {{ mensagem.chat_id }}</div>
@@ -167,14 +166,14 @@ export default {
             </div>
 
             <!-- Input para nova mensagem -->
-            <div class="d-flex flex-row" style="width: 80%;">
-                <input class="form-control col-9 me-2 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
+            <div class="d-flex flex-row justify-content-between" style="width: 100%;">
+                <input class="form-control me-2 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
                 <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar mensagem</button>
             </div>
         </div>
 
         <!-- Placeholder quando nenhum chat está selecionado -->
-        <div v-else class="col-8 d-flex align-items-center justify-content-center h-100" style="background-color: rgba(0, 0, 0, 0.7);">
+        <div v-else class="col-8 d-flex align-items-center justify-content-center h-100">
             <h1 class="text-white">Acesse um chat para visualizá-lo.</h1>
         </div>
     </div>

@@ -118,10 +118,10 @@ export default {
 <template>
     <div class="d-flex">
         <!-- Lista de Conversas -->
-        <div class="col-4 p-4 border-end" style="background-color: rgba(0, 0, 0, 0.7); height: calc(100vh - 7rem);">
-            <h1 class="mb-4" style="color: white;">Conversas</h1>
-            <div style="height: 100%; overflow-y: auto;">
-                <div v-for="chat in chatsFechados" :key="chat.id" class="card mb-3" style="background-color: rgba(0, 0, 0, 0.5); color: white;">
+        <div class="col-4 p-4 border-end" style="background-color: rgba(0, 0, 0, 0.7); height: calc(100vh - 3.5rem);">
+            <h1 class="mb-4">Chats fechados</h1>
+            <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
+                <div v-for="chat in chatsFechados" :key="chat.id" @click="getMessage(chat.id)" class="card" style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
                     <div class="card-body">
                         <h5 class="card-title">{{ chat.assunto }}</h5>
                         <p class="card-text">
@@ -133,8 +133,6 @@ export default {
                         <p class="card-text">
                             <strong>Status:</strong> {{ chat.chat_status }}
                         </p>
-                        <button @click="getMessage(chat)" class="btn btn-primary btn-sm">Acessar chat</button>
-                        <br><br>
                     </div>
                 </div>
             </div>

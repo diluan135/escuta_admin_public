@@ -51,7 +51,7 @@ export default {
     </div>
     <div v-else>
         <Barra></Barra>
-        <div id="render-principal">
+        <div>
             <component :is="currentViewComponent"></component>
         </div>
     </div>
@@ -71,10 +71,4 @@ export default {
     z-index: 1000;
 }
 
-#render-principal {
-    background: rgb(0, 108, 119);
-    background: linear-gradient(90deg, rgba(0, 108, 119, 1) 10%, rgba(0, 68, 108, 1) 45%, rgba(0, 18, 29, 1) 83%);
-    height: calc(100vh - 5rem);
-    overflow-y: auto;
-}
 </style>

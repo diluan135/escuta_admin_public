@@ -12,6 +12,7 @@ include(base_path('app/Http/verifica_conexao.php'));
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,22 +21,25 @@ include(base_path('app/Http/verifica_conexao.php'));
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Painel ADM</title>
 </head>
+
 <body>
     {{-- @include('header') --}}
-    <div style="background-color:blueviolet; margin: 0; padding:0;">
-        <div> <?php
-            print_r($_SESSION);
-        ?></div>
-        <div id="app">
-            <App />
-        </div>
+    <div id="app">
+        <App />
     </div>
-
     @vite('resources/js/app.js')
     <script>
         window.nomeServidor = "{{ $_SESSION['nomeServidor'] }}";
         window.idServidor = "{{ $_SESSION['idServidor'] }}";
     </script>
 </body>
+
+<style>
+    #app {
+        background: rgb(0, 108, 119);
+        background: linear-gradient(90deg, rgba(0, 108, 119, 1) 10%, rgba(0, 68, 108, 1) 45%, rgba(0, 18, 29, 1) 83%);
+        height: 100%;
+    }
+</style>
 
 </html>

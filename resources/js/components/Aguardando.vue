@@ -111,8 +111,8 @@ export default {
                 <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">Fechar chat</button>
             </div>
 
-            <div class="chat-messages flex-grow-1 overflow-auto mb-3">
-                <div v-for="mensagem in mensagens" :key="mensagem.id" class="mb-2">
+            <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column">
+                <div v-for="mensagem in mensagens" :key="mensagem.id">
                     <div class="alert" :class="{'alert-secondary': mensagem.chat_id % 2 === 0, 'alert-dark': mensagem.chat_id % 2 !== 0}" style="color: white;">
                         <span>{{ mensagem.mensagem }}</span>
                         <div class="text-muted small">Chat ID: {{ mensagem.chat_id }}</div>

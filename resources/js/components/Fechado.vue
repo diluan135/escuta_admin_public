@@ -168,8 +168,8 @@ export default {
                             <button @click="publicarChat()" class="btn btn-success btn-sm" :disabled="loading">Publicar mensagens</button>
                         </div>
                     </div>
-                    <div v-else class="row">
-                        <input class="form-control col-8 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
+                    <div v-else class="d-flex flex-row justify-content-between" style="width: 100%;">
+                        <input class="form-control me-2 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
                         <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar mensagem</button>
                         <!-- Dica para mensagem vazia -->
                         <div v-if="novaMensagem.trim() === ''" class="text-danger mt-2">A mensagem não pode estar vazia.</div>

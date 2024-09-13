@@ -21,13 +21,14 @@ export default {
     methods: {
         ...mapActions(['fetchChats']),
         async getMessage(chat_id) {
+            console.log(`O ID do chat é ${chat_id}`)
             const response = await axios.get('/api/mensagem', {
                 params: {
                     chat_id: chat_id,
                 }
             }
             )
-            console.log(response)
+            console.log(response.data)
             this.mensagens = response.data
             this.chatSelecionado = chat_id
         },
@@ -86,7 +87,7 @@ export default {
         <div class="col-4 p-4 border-end" style="background-color: rgba(0, 0, 0, 0.7); height: calc(100vh - 3.5rem);">
             <h1 class="mb-4">Chats aguardando</h1>
             <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
-                <div v-for="chat in chats" :key="chat.id" @click="getMessage(chat.id)" class="card" style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
+                <div v-for="chat in chats" :key="chat.id" class="card" @click="getMessage(chat.id)" style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
                     <div class="card-body">
                         <h5 class="card-title">{{ chat.assunto }}</h5>
                         <p class="card-text">
@@ -104,8 +105,8 @@ export default {
         </div>
 
         <!-- Mensagens do Chat -->
-        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3" style="background-color: rgba(0, 0, 0, 0.7); height: calc(100vh - 3rem); width: 60vw;">
-            <div class="border-bottom pb-3 mb-3" style="border-bottom-color: #fff;">
+        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3" style="background-color: rgba(0, 0, 0, 0.7); height: calc(100vh - 3.5rem); width: 66.66%;">
+            <div class="border-bottom pb-3 mb-3 d-flex flex-row justify-content-between">
                 <h3 class="text-white">Chat ativo</h3>
                 <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">Fechar chat</button>
             </div>
@@ -120,8 +121,8 @@ export default {
             </div>
 
             <!-- Input para nova mensagem -->
-            <div class="d-flex flex-row" style="width: 80%;">
-                <input class="form-control col-9 me-2 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
+            <div class="d-flex flex-row justify-content-between" style="width: 100%;">
+                <input class="form-control me-2 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
                 <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar mensagem</button>
             </div>
         </div>

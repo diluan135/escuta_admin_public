@@ -5,10 +5,11 @@ export default {
     data() {
         return {
             exibirEnquetes: false,
+            exibirUsuarios: false,
         }
     },
     computed: {
-        ...mapState(['enquetes']),
+        ...mapState(['enquetes', 'usuarios']),
         reversedEnquetes() {
             return [...this.enquetes].reverse();
         },
@@ -18,7 +19,22 @@ export default {
 
         enquetesEncerradas() {
             return this.enquetes.filter(enquete => new Date(enquete.encerra_em) <= new Date());
+        },
+        usuariosTotais() {
+            return this.usuarios.length
+        },
+        usuariosSemana() {
+            const seteDiasAtras = new Date();
+            seteDiasAtras.setDate(seteDiasAtras.getDate() - 7); // Subtrai 7 dias da data atual
+            return this.usuarios.filter(usuario => new Date(usuario.created_at) >= seteDiasAtras && new Date(usuario.created_at) <= new Date());
+        },
+        usuariosMes() {
+            const trintaUmDiasAtras = new Date();
+            trintaUmDiasAtras.setDate(trintaUmDiasAtras.getDate() - 31); // Subtrai 31 dias da data atual
+            return this.usuarios.filter(usuario => new Date(usuario.created_at) >= trintaUmDiasAtras && new Date(usuario.created_at) <= new Date());
         }
+
+
     },
     mounted() {
     },
@@ -51,12 +67,13 @@ export default {
     transition: max-height 0.3s ease, opacity 0.3s ease;
 }
 </style>
+
 <template>
-    <div style="padding:4%;">
+    <div style="padding:4%; overflow-y: auto;">
         <div class="row" style="height: calc(100vh - 5rem);">
 
             <!-- Enquetes -->
-            <div class="col-3 templateBox" style="margin-right:4vw;">
+            <div class="col-3 templateBox" style="margin-right:3vw;">
                 <div style="color: #fff; margin: 20px;">
                     <div class="row">
                         <div class="col">
@@ -127,7 +144,7 @@ export default {
 
 
 
-            <div class="col-3 templateBox" style="margin-right:4vw;">
+            <div class="col-3 templateBox" style="margin-right:3vw;">
                 <div style="color: #fff; margin: 20px;">
                     <div class="row">
                         <div class="col">
@@ -139,6 +156,53 @@ export default {
                     </div>
                 </div>
             </div>
+
+
+            <!-- --------------------------- Usuarios ---------------------------------- -->
+            <div style="width: 25vw;" class="col-1 templateBox">
+                <div style="color: #fff; margin: 20px;">
+                    <div class="row">
+                        <div class="col">
+                            <h2>Usuários</h2>
+                        </div>
+                        <div class="col d-flex justify-content-end">
+                            <button class="botaoNeon" v-if="!this.exibirUsuarios"
+                                @click="exibirUsuarios = !exibirUsuarios">Exibir usuarios</button>
+                            <button class="botaoNeon" v-else @click="exibirUsuarios = !exibirUsuarios">Ocultar</button>
+                        </div>
+                        <div style="color: #fff;" v-if="this.exibirUsuarios">
+                            <hr>
+                            <div v-for="usuario in usuarios" style="color: #fff;" v-if="this.exibirUsuarios">
+                                {{ usuario.name }} {{ usuario.sobrenome }}
+                                <br>
+                                Email: {{ usuario.email }}
+                                <br>
+                                CPF: {{ usuario.CPF }}
+                                <hr>
+                            </div>
+                        </div>
+                        <div v-else style="color: #fff;">
+                            <hr>
+                            <h3>Usuários totais: {{ usuariosTotais }}</h3>
+                            <br>
+                            <span>Novos usuários na última semana: {{ usuariosSemana.length }}</span>
+                            <br>
+                            <span>Novos usuários no ultimo mês: {{ usuariosMes.length }}</span>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="row" style="height: calc(100vh - 5rem); color:white; margin-top: 4vh;">
+                <div style="width: 63vw;" class="col-1 templateBox">
+                    <span> udajsiuhdsiau</span>  
+                </div>
+            </div>
+
+
         </div>
     </div>
 

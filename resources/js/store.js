@@ -12,6 +12,7 @@ export default createStore({
             chatsFechados: [],
             enquetes: [],
             faq: [],
+            usuarios: [],
         };
     },
     mutations: {
@@ -36,6 +37,9 @@ export default createStore({
         setFAQ(state, faq) {
             state.faq = faq;
         },
+        setUsuarios(state, usuarios){
+            state.usuarios = usuarios;
+        }
     },
     actions: {
         async fetchData({ commit, dispatch }) {
@@ -49,6 +53,7 @@ export default createStore({
                 dispatch('fetchChatsFechados'),
                 dispatch('fetchEnquetes'),
                 dispatch('fetchFAQ'),
+                dispatch('fetchUsuarios'),
             ]);
 
             // Finaliza o estado de carregamento
@@ -94,6 +99,15 @@ export default createStore({
             try {
                 const response = await axios.get('/api/FAQ'); // Ajuste o endpoint conforme necessário
                 commit('setFAQ', response.data);
+                console.log(response)
+            } catch (error) {
+                console.error('Failed to fetch FAQ', error);
+            }
+        },
+        async fetchUsuarios({ commit }) {
+            try {
+                const response = await axios.get('/api/usuario/get'); // Ajuste o endpoint conforme necessário
+                commit('setUsuarios', response.data);
                 console.log(response)
             } catch (error) {
                 console.error('Failed to fetch FAQ', error);

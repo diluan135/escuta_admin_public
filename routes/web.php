@@ -34,6 +34,7 @@ Route::post('/api/teste-conexao', function (Request $request) {
 Route::get('/', [HomeController::class, 'index'])->name('home');    //Redireciona para home
 Route::get('api/linhas', [LinhasController::class, 'index']);       //Puxa as linhas (Utiliza outra BD)
 Route::post('/api/test-event', [TestController::class, 'sendEvent']);
+Route::get('/api/usuario/get', [LoginController::class, 'get']);
 
 
 // ------------------------------------------- ROTAS DE ENQUETES -----------------------------------------------------

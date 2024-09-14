@@ -15,6 +15,12 @@ class LoginController extends Controller
         return view('login');
     }
 
+    public function get(Request $request){
+        $usuarios = Usuario::get(['name', 'sobrenome', 'email', 'CPF', 'created_at']);
+
+        return response()->json($usuarios);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

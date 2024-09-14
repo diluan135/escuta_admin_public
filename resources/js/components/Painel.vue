@@ -2,10 +2,11 @@
 import { mapState, mapActions } from 'vuex';
 import axios from 'axios';
 import BarChart from './BarChart.vue';
+import PieChart from './PieChart.vue';
 
 export default {
     components: {
-        BarChart
+        BarChart, PieChart
     },
     data() {
         return {
@@ -78,9 +79,44 @@ export default {
                     }
                 ]
             };
-        }
+        },
+        pieChartData() {
+            const chatsCount = this.chats.length;
+            const chatsAbertosCount = this.chatsAbertos.length;
+            const chatsFechadosCount = this.chatsFechados.length;
 
-    },
+            return {
+                labels: ['Chats Novos', 'Chats Abertos', 'Chats Fechados'],
+                datasets: [
+                    {
+                        label: 'Contagem de Chats',
+                        data: [chatsCount, chatsAbertosCount, chatsFechadosCount],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)', // Cor para 'Chats Novos'
+                            'rgba(54, 162, 235, 0.2)',  // Cor para 'Chats Abertos'
+                            'rgba(255, 206, 86, 0.2)'   // Cor para 'Chats Fechados'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',    // Borda para 'Chats Novos'
+                            'rgba(54, 162, 235, 1)',    // Borda para 'Chats Abertos'
+                            'rgba(255, 206, 86, 1)'     // Borda para 'Chats Fechados'
+                        ],
+                        borderWidth: 1
+                    }
+                ]
+            };
+        },
+        legendData() {
+            return {
+                'Chats Novos': { count: this.chats.length, color: 'rgba(255, 99, 132, 0.2)' },
+                'Chats Abertos': { count: this.chatsAbertos.length, color: 'rgba(54, 162, 235, 0.2)' },
+                'Chats Fechados': { count: this.chatsFechados.length, color: 'rgba(255, 206, 86, 0.2)' }
+            };
+        }
+    }
+
+
+    ,
     mounted() {
     },
     methods: {
@@ -114,11 +150,26 @@ export default {
 </style>
 
 <template>
-    <div style="padding:4%; overflow-y: auto;">
+    <div style="padding-left:4%; padding-right: 4%; padding-top: 2%; overflow-y: auto;">
         <div class="row" style="height: calc(100vh - 5rem);">
 
+            <!-- ----------------------------------- TABELONA GRANDE --------------------------------------- -->
+            <div class="row" style=" color:white; margin-bottom: 4vh;">
+                <div style="margin-right:2vw; width: 63vw; height: auto;" class="col-1 templateBox">
+                    <h2 style="padding-left:1vw; padding-top: 2vh; margin-bottom: 2vh;">Linhas com solicitações</h2>
+                    <BarChart :chartData="barChartData" />
+                </div>
+
+
+                <!-- ----------------------------------- GRAFICO --------------------------------------- -->
+                <div style="height: auto; margin-left: 2vh;" class="col templateBox">
+                    <h2 style="padding-left:1vw; padding-top: 2vh; margin-bottom: 2vh;">Chats</h2>
+                    <PieChart :chartData="pieChartData" :legendData="legendData" />
+                </div>
+            </div>
+
             <!-- Enquetes -->
-            <div class="col-3 templateBox" style="margin-right:3vw;">
+            <div class="col-4 templateBox" style="margin-right:3vw;">
                 <div style="color: #fff; margin: 20px;">
                     <div class="row">
                         <div class="col">
@@ -130,8 +181,6 @@ export default {
                             <button class="botaoNeon" v-else @click="exibirEnquetes = !exibirEnquetes">Ocultar
                                 Enquetes</button>
                         </div>
-
-
                     </div>
 
                     <!-- enquetes sendo exibidas -->
@@ -189,7 +238,7 @@ export default {
 
 
 
-            <div class="col-3 templateBox" style="margin-right:3vw;">
+            <div class="col-4 templateBox" style="margin-right:3vw;">
                 <div style="color: #fff; margin: 20px;">
                     <div class="row">
                         <div class="col">
@@ -202,9 +251,8 @@ export default {
                 </div>
             </div>
 
-
             <!-- --------------------------- Usuarios ---------------------------------- -->
-            <div style="width: 25vw;" class="col-1 templateBox">
+            <div style="width: 25vw;" class="col-4 templateBox">
                 <div style="color: #fff; margin: 20px;">
                     <div class="row">
                         <div class="col">
@@ -239,13 +287,6 @@ export default {
                 </div>
             </div>
 
-
-            <!-- ----------------------------------- TABELONA GRANDE --------------------------------------- -->
-            <div class="row" style="height: calc(100vh - 5rem); color:white; margin-top: 4vh;">
-                <div style="width: 63vw; height: auto; margin-bottom: 20vh;"  class="col-1 templateBox">
-                    <BarChart :chartData="barChartData" />
-                </div>
-            </div>
 
 
         </div>

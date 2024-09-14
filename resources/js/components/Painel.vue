@@ -1,7 +1,12 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import axios from 'axios';
+import BarChart from './BarChart.vue';
+
 export default {
+    components: {
+        BarChart
+    },
     data() {
         return {
             exibirEnquetes: false,
@@ -9,7 +14,7 @@ export default {
         }
     },
     computed: {
-        ...mapState(['enquetes', 'usuarios']),
+        ...mapState(['enquetes', 'usuarios', 'chats', 'chatsAbertos', 'chatsFechados']),
         reversedEnquetes() {
             return [...this.enquetes].reverse();
         },
@@ -32,8 +37,48 @@ export default {
             const trintaUmDiasAtras = new Date();
             trintaUmDiasAtras.setDate(trintaUmDiasAtras.getDate() - 31); // Subtrai 31 dias da data atual
             return this.usuarios.filter(usuario => new Date(usuario.created_at) >= trintaUmDiasAtras && new Date(usuario.created_at) <= new Date());
-        }
+        },
+        chatsLinhas() {
+            const contagemLinhas = {};
 
+            // Helper function to contar as linhas
+            const contarLinhas = (chatsArray) => {
+                chatsArray.forEach(chat => {
+                    const linha = chat.linha;
+                    if (linha != null) {
+                        if (contagemLinhas[linha]) {
+                            contagemLinhas[linha]++;
+                        } else {
+                            contagemLinhas[linha] = 1;
+                        }
+                    }
+                });
+            };
+
+            // Contar linhas dos chats
+            contarLinhas(this.chats);
+            contarLinhas(this.chatsAbertos);
+            contarLinhas(this.chatsFechados);
+
+            return contagemLinhas;
+        },
+        barChartData() {
+            const labels = Object.keys(this.chatsLinhas);
+            const data = Object.values(this.chatsLinhas);
+
+            return {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Contagem de Chats por Linha',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
+        }
 
     },
     mounted() {
@@ -195,10 +240,10 @@ export default {
             </div>
 
 
-
+            <!-- ----------------------------------- TABELONA GRANDE --------------------------------------- -->
             <div class="row" style="height: calc(100vh - 5rem); color:white; margin-top: 4vh;">
-                <div style="width: 63vw;" class="col-1 templateBox">
-                    <span> udajsiuhdsiau</span>  
+                <div style="width: 63vw; height: auto; margin-bottom: 20vh;"  class="col-1 templateBox">
+                    <BarChart :chartData="barChartData" />
                 </div>
             </div>
 

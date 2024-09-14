@@ -99,7 +99,7 @@ export default createStore({
             try {
                 const response = await axios.get('/api/FAQ'); // Ajuste o endpoint conforme necessário
                 commit('setFAQ', response.data);
-                console.log(response)
+                // console.log(response)
             } catch (error) {
                 console.error('Failed to fetch FAQ', error);
             }
@@ -108,7 +108,7 @@ export default createStore({
             try {
                 const response = await axios.get('/api/usuario/get'); // Ajuste o endpoint conforme necessário
                 commit('setUsuarios', response.data);
-                console.log(response)
+                // console.log(response)
             } catch (error) {
                 console.error('Failed to fetch FAQ', error);
             }

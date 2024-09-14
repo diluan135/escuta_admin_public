@@ -19,7 +19,7 @@
     margin-left:2.5%;
     background: rgb(20, 25, 50, 0.7);
     height: 75vh;
-    border-radius: 2.5rem;
+    border-radius: 1.5rem;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
 }
 
@@ -170,6 +170,7 @@ h2 {
     border: 0 solid transparent;
     box-shadow: 0 0px 4px rgba(0, 0, 0, 0.5);
     outline: none;
+    color: white;
     background-color: #003f52; /* Garante que o fundo não mude no foco */
 }
 

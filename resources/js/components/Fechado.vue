@@ -8,11 +8,14 @@ export default {
             mensagens: [],
             novaMensagem: '',
             chatSelecionado: null,
+            chatTipo: null,
+            chatAssunto: null,
+            chatLinha: null,
             loading: false,
             avisoPublicar: false,
             editarMensagens: false,
-            publicarStatus: [], // Armazena o estado de publicação para cada mensagem
-        }
+            publicarStatus: []  // Armazena o status de publicação das mensagens
+        };
     },
     computed: {
         ...mapState(['chatsFechados', 'user']),
@@ -22,19 +25,20 @@ export default {
     },
     methods: {
         ...mapActions(['fetchChatsFechados']),
-        async getMessage(chat_id) {
+        async getMessage(chat) {
             const response = await axios.get('/api/mensagem', {
-                params: {
-                    chat_id: chat_id,
-                }
+                params: { chat_id: chat.id }
             });
-            console.log(response);
             this.mensagens = response.data;
-            this.chatSelecionado = chat_id;
-            this.publicarStatus = this.mensagens.map(() => true); // Predefine como publicável (true) para todas as mensagens
+            this.chatSelecionado = chat.id;
+            this.chatTipo = chat.tipo;
+            this.chatAssunto = chat.assunto;
+            this.chatLinha = chat.linha;
+            this.publicarStatus = this.mensagens.map(() => true);  // Inicializa com todas as mensagens publicáveis
+
         },
         async mandarMensagem() {
-            if (!this.chatSelecionado) {
+            if (!this.chatSelecionado || !this.novaMensagem) {
                 console.error('Nenhum chat selecionado.');
                 return;
             }
@@ -43,11 +47,10 @@ export default {
 
             try {
                 const response = await axios.post('/api/mensagem/enviarMensagem', {
-                    admin_id: parseInt(idServidor, 10),
+                    admin_id: parseInt(this.idServidor, 10),
                     chat_id: this.chatSelecionado,
                     mensagem: this.novaMensagem,
                 });
-                console.log('Mensagem enviada:', response.data);
                 this.novaMensagem = '';
                 await this.getMessage(this.chatSelecionado);
             } catch (error) {
@@ -61,39 +64,46 @@ export default {
                 console.error('Nenhum chat selecionado.');
                 return;
             }
-            this.editarMensagens = true; // Ativa o modo de edição
             this.avisoPublicar = true;
+            this.editarMensagens = true; // Ativa o modo de edição
         },
         async publicarChat() {
-            const mensagensPublicaveis = this.mensagens.map((mensagem, index) => {
-                const mensagemPublicada = {
-                    admin_id: mensagem.admin_id,
-                    mensagem: this.publicarStatus[index] ? mensagem.mensagem : '',
-                };
+            if (!this.chatSelecionado) {
+                console.error('Nenhum chat selecionado.');
+                return;
+            }
 
-                console.log("Mensagem Publicável:", mensagemPublicada);
+            this.loading = true;
+            console.log(this.chatSelecionado, this.chatTipo, this.chatAssunto, this.chatLinha);
 
-                return mensagemPublicada;
-            });
-
+            const mensagensPublicaveis = this.mensagens.map((mensagem, index) => ({
+                admin_id: mensagem.admin_id,
+                mensagem: mensagem.mensagem,
+                publicado: this.publicarStatus[index] ? 1 : 0,
+            }));
+            
             try {
-                console.log("Mensagens a serem publicadas:", mensagensPublicaveis);
-
-                const response = await axios.post('/api/chat/publicarChat', {
+                await axios.post('/api/FAQ/publicarChat', {
                     chat_id: this.chatSelecionado,
+                    tipo: this.chatTipo,
+                    assunto: this.chatAssunto,
+                    linha: this.chatLinha,
                     mensagens: mensagensPublicaveis,
                 });
 
-                console.log('Chat publicado:', response.data);
-                this.chatSelecionado = null;
-                this.editarMensagens = false; // Desativa o modo de edição após a publicação
-                this.avisoPublicar = false;
+                await this.$store.dispatch('fetchFAQ');
             } catch (error) {
                 console.error('Erro ao publicar chat:', error);
+                this.chatSelecionado = null;
+                this.editarMensagens = false;
+                this.avisoPublicar = false;
+            } finally {
+                this.loading = false;
+                this.chatSelecionado = null;
+                this.editarMensagens = false;
+                this.avisoPublicar = false;
             }
-        },
-
-        cancelarPublicarChat() {
+        }, cancelarPublicarChat() {
             this.avisoPublicar = false;
             this.editarMensagens = false; // Desativa o modo de edição
         }
@@ -101,72 +111,62 @@ export default {
     mounted() {
         this.fetchChatsFechados();
         this.avisoPublicar = false;
-    },
+    }
 };
 </script>
 
 <template>
+    <h2>FECHADO</h2>
     <div class="d-flex">
-        <!-- Lista de Conversas Fechadas -->
-        <div class="col-4 p-4 border-end" style="height: calc(100vh - 3.5rem); background-color: rgba(0, 0, 0, 0.7);">
-            <h1 class="mb-4">Chats fechados</h1>
-            <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
-                <div v-for="chat in chatsFechados" :key="chat.id" @click="getMessage(chat.id)" class="card" style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ chat.assunto }}</h5>
-                        <p class="card-text">
-                            <strong>Criado em:</strong> {{ chat.criado_em }}
-                        </p>
-                        <p v-if="chat.linha != null" class="card-text">
-                            <strong>Linha:</strong> {{ chat.linha }}
-                        </p>
-                        <p class="card-text">
-                            <strong>Status:</strong> {{ chat.chat_status }}
-                        </p>
+        <div class="col-4">
+            <h1>Conversas</h1>
+            <div v-for="chat in chatsFechados" :key="chat.id">
+                <div>{{ chat.assunto }}</div>
+                <div>{{ chat.criado_em }}</div>
+                <div v-if="chat.linha">{{ chat.linha }}</div>
+                <div>{{ chat.chat_status }}</div>
+                <button @click="getMessage(chat)">Acessar chat</button>
+                <br><br>
+            </div>
+        </div>
+        <div v-if="this.chatSelecionado" class="col-8">
+            <div v-if="avisoPublicar" class="row">
+                <p>Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas e/ou palavras erradas e de
+                    baixo calão!</p>
+            </div>
+            <div v-else>
+                <div v-if="mensagens.length" class="row justify-content-end">
+                    <button @click="modoPublicarChat()" class="col-2" :disabled="loading">Tornar chat público</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <div v-for="(mensagem, index) in mensagens" :key="mensagem.id">
+                        <span v-if="!editarMensagens">
+                            (Admin:{{ mensagem.admin_id }}) diz: {{ mensagem.mensagem }}
+                        </span>
+                        <div v-else>
+                            <input v-model="mensagem.mensagem" class="form-control" />
+                            <label>
+                                Publicar
+                                <input type="checkbox" v-model="publicarStatus[index]" checked />
+                            </label>
+                        </div>
+                    </div>
+                    <div v-if="editarMensagens" class="row">
+                        <div class="col text-end">
+                            <button @click="cancelarPublicarChat()" class="col-2" :disabled="loading">Cancelar</button>
+                            <button @click="publicarChat()" class="col-2" :disabled="loading">Publicar
+                                mensagens</button>
+                        </div>
+                    </div>
+                    <div v-else class="row">
+                        <input class="col-8" type="text" v-model="novaMensagem">
+                        <button @click="mandarMensagem()" class="col" :disabled="loading">Enviar mensagem</button>
+                        <!-- davi deixa um jeito bonitinho de exibir que não da pra mandar mensagem vazia caso o usuário tente -->
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Mensagens do Chat Fechado -->
-        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3" style="height: calc(100vh - 3.5rem); width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7);">
-            <div class="border-bottom pb-3 mb-3 d-flex flex-row justify-content-between">
-                <h3 class="text-white">Chat Fechado</h3>
-                <button @click="modoPublicarChat()" class="btn btn-warning btn-sm" :disabled="loading">Tornar chat público</button>
-            </div>
-
-            <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column">
-                <div v-for="(mensagem, index) in mensagens" :key="mensagem.id">
-                    <div v-if="!editarMensagens" class="alert alert-secondary" style="color: white;">
-                        <span>(Admin: {{ mensagem.admin_id }}) diz: {{ mensagem.mensagem }}</span>
-                    </div>
-                    <div v-else class="alert alert-dark" style="color: white;">
-                        <input v-model="mensagem.mensagem" class="form-control mb-2" />
-                        <label>
-                            Publicar
-                            <input type="checkbox" v-model="publicarStatus[index]" checked />
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Botões de Publicação -->
-            <div v-if="editarMensagens" class="d-flex flex-row justify-content-end mt-3">
-                <button @click="cancelarPublicarChat()" class="btn btn-secondary me-2" :disabled="loading">Cancelar</button>
-                <button @click="publicarChat()" class="btn btn-success" :disabled="loading">Publicar mensagens</button>
-            </div>
-
-            <!-- Input para nova mensagem -->
-            <div v-else class="d-flex flex-row justify-content-between mt-3" style="width: 100%;">
-                <input class="form-control me-2 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
-                <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar mensagem</button>
-            </div>
-        </div>
-
-        <!-- Placeholder quando nenhum chat está selecionado -->
-        <div v-else class="col-8 d-flex align-items-center justify-content-center h-100">
-            <h1 class="text-white">Acesse um chat para visualizá-lo.</h1>
         </div>
     </div>
 </template>
-

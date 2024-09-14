@@ -21,6 +21,7 @@ window.Echo = new Echo({
 export default {
     data() {
         return {
+            chat: [],
             mensagens: [],
             novaMensagem: '',
             chatSelecionado: null,
@@ -37,17 +38,18 @@ export default {
     },
     methods: {
         ...mapActions(['fetchChatsAbertos']),
-        async getMessage(chat_id) {
+        async getMessage(chat) {
+            this.chat = chat;
             this.loadingstats = 1;
             try {
                 const response = await axios.get('/api/mensagem', {
-                    params: { chat_id: chat_id },
+                    params: { chat_id: chat.id },
                 });
                 this.mensagens = response.data;
-                this.chatSelecionado = chat_id;
+                this.chatSelecionado = chat.id;
 
                 // Reconfigura o canal para o chat selecionado
-                window.Echo.channel('chat.' + chat_id)
+                window.Echo.channel('chat.' + chat.id)
                     .listen('MensagemEnviada', (event) => {
                         console.log('Mensagem recebida:', event.mensagem);
                         this.mensagens.push(event.mensagem);
@@ -72,7 +74,7 @@ export default {
                 });
                 console.log('Mensagem enviada:', response.data);
                 this.novaMensagem = '';
-                await this.getMessage(this.chatSelecionado);
+                await this.getMessage(this.chat);
             } catch (error) {
                 console.error('Erro ao enviar mensagem:', error);
             } finally {
@@ -155,9 +157,9 @@ export default {
     <div class="d-flex Box">
         <!-- Lista de Conversas -->
         <div class="col-4"
-            style=" height: 100%; overflow-y: auto; background-color: rgba(17, 132, 174, 0.1); border-top-left-radius: 2.5rem; border-bottom-left-radius: 1.5rem;">
+            style=" height: 100%; overflow-y: auto; background-color: rgba(17, 132, 174, 0.1); border-top-left-radius: 1.5rem; border-bottom-left-radius: 1.5rem;">
             <div>
-                <div v-for="chat in chatsAbertos" :key="chat.id" @click="getMessage(chat.id)" class="card"
+                <div v-for="chat in chatsAbertos" :key="chat.id" @click="getMessage(chat)" class="card"
                     style="background-color: rgba(100, 100, 100, 0); width: 100%;">
                     <div class="card-body" style="padding-left: 2rem;">
                         <h3 class="card-title">{{ chat.assunto }}</h3>
@@ -178,23 +180,23 @@ export default {
 
         <!-- Mensagens do Chat -->
         <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3"
-            style=" width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7);">
+            style=" width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7); border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
             <div class="border-bottom pb-3 mb-3 d-flex flex-row justify-content-between">
-                <h3 class="text-white">Chat ativo</h3>
+                <h3 class="text-white">Assunto: {{ this.chat.assunto }}</h3>
                 <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">Fechar chat</button>
             </div>
 
             <div class="d-flex flex-column justify-content-between" style="height: 90%;">
                 <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column mb-3">
                     <div v-for="mensagem in mensagens" :key="mensagem.id"
-                        :class="{ 'd-flex justify-content-start': mensagem.admin_id !== null, 'd-flex justify-content-end': mensagem.admin_id === null }"
+                        :class="{ 'd-flex justify-content-end': mensagem.admin_id !== null, 'd-flex justify-content-start': mensagem.admin_id === null }"
                         style="margin-bottom: 0.5rem;">
                         <div class="alert alert-dark"
                             style="color: white; display: inline-block; max-width: 70%; word-wrap: break-word; border: none;">
                             <div class="message-content">
                                 <!-- Rótulo acima da mensagem -->
-                                <div style="color: #6adae9 ; font-weight: bold;">
-                                    {{ mensagem.admin_id !== null ? 'Admin:' : 'Você:' }}
+                                <div style="color: #6adae9; font-weight: bold;">
+                                    {{ mensagem.admin_id !== null ? 'Admin:' : 'Usuário:' }}
                                 </div>
                                 <span>{{ mensagem.mensagem }}</span>
                                 <!-- Horário no canto inferior direito -->
@@ -205,6 +207,7 @@ export default {
                         </div>
                     </div>
                 </div>
+
 
 
                 <!-- Input para nova mensagem -->
@@ -220,7 +223,7 @@ export default {
 
         <!-- Placeholder quando nenhum chat está selecionado -->
         <div v-else class="col-8 d-flex align-items-center justify-content-center h-100"
-            style="background-color: rgba(0, 0, 0, 0.7); border-top-right-radius: 2.5rem; border-bottom-right-radius: 2.5rem;">
+            style="background-color: rgba(0, 0, 0, 0.7); border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
             <div class="text-center">
                 <h1 v-if="this.loadingstats == 0" class="text-white">Acesse um chat para visualizá-lo.</h1>
                 <div v-if="this.loadingstats == 1" class="spinner-border text-primary" role="status">

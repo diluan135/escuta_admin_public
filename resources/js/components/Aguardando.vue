@@ -5,12 +5,13 @@ import axios from 'axios';
 export default {
     data() {
         return {
+            chat: [],
             mensagens: [],
             novaMensagem: '',
             chatSelecionado: null,
             loading: false,
+            loadingstats: 0,
         }
-
     },
     computed: {
         ...mapState(['chats', 'user']),
@@ -20,17 +21,25 @@ export default {
     },
     methods: {
         ...mapActions(['fetchChats']),
-        async getMessage(chat_id) {
-            console.log(`O ID do chat é ${chat_id}`)
-            const response = await axios.get('/api/mensagem', {
-                params: {
-                    chat_id: chat_id,
-                }
+        async getMessage(chat) {
+            this.chat = chat;
+            this.loadingstats = 1;
+            try {
+                const response = await axios.get('/api/mensagem', {
+                    params: { chat_id: chat.id },
+                });
+                this.mensagens = response.data;
+                this.chatSelecionado = chat.id;
+
+                // Reconfigura o canal para o chat selecionado
+                window.Echo.channel('chat.' + chat.id)
+                    .listen('MensagemEnviada', (event) => {
+                        console.log('Mensagem recebida:', event.mensagem);
+                        this.mensagens.push(event.mensagem);
+                    });
+            } catch (error) {
+                console.error('Erro ao buscar mensagens:', error);
             }
-            )
-            console.log(response.data)
-            this.mensagens = response.data
-            this.chatSelecionado = chat_id
         },
         async mandarMensagem() {
             if (!this.chatSelecionado) {
@@ -42,13 +51,13 @@ export default {
 
             try {
                 const response = await axios.post('/api/mensagem/enviarMensagem', {
-                    admin_id: parseInt(idServidor, 10),
+                    admin_id: parseInt(this.idServidor, 10),
                     chat_id: this.chatSelecionado,
                     mensagem: this.novaMensagem,
                 });
                 console.log('Mensagem enviada:', response.data);
                 this.novaMensagem = '';
-                await this.getMessage(this.chatSelecionado);
+                await this.getMessage(this.chat);
             } catch (error) {
                 console.error('Erro ao enviar mensagem:', error);
             } finally {
@@ -61,75 +70,126 @@ export default {
                 return;
             }
 
+            const confirmation = window.confirm('Tem certeza de que deseja encerrar este chat?');
+            if (!confirmation) {
+                return;
+            }
+
             try {
                 const response = await axios.post('/api/chat/fecharChat', {
                     chat_id: this.chatSelecionado,
-                },
-                );
+                });
                 console.log('Chat fechado:', response.data);
                 this.chatSelecionado = null;
+                this.mensagens = [];
+                this.loadingstats = 0;
+                this.fetchChats();
             } catch (error) {
                 console.error('Erro ao fechar chat:', error);
             }
         },
+        formatarData(data) {
+            const date = new Date(data);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const time = `${hours}:${minutes}`;
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const formattedDate = `${day}/${month}/${year}`;
+            return `${time}, em ${formattedDate}`;
+        }
     },
     mounted() {
         this.fetchChats();
         console.log(this.chats);
-        console.log(idServidor);
+        console.log(this.idServidor);
+        window.Echo.channel('chat.' + this.chatSelecionado)
+            .listen('MensagemEnviada', (event) => {
+                console.log('Mensagem recebida:', event.mensagem);
+                this.mensagens.push(event.mensagem);
+            });
     },
 };
 </script>
 
 <template>
-    <div class="d-flex">
+    <h1 class="lemon-font" style="margin-right: 2.5%; margin-left: 5%; margin-top: 2.5%">Chats aguardando</h1>
+    <div class="d-flex Box">
         <!-- Lista de Conversas -->
-        <div class="col-4 p-4 border-end" style="background-color: rgba(0, 0, 0, 0.7); height: calc(100vh - 3.5rem);">
-            <h1 class="mb-4">Chats aguardando</h1>
-            <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
-                <div v-for="chat in chats" :key="chat.id" class="card" @click="getMessage(chat.id)" style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ chat.assunto }}</h5>
+        <div class="col-4"
+            style="height: 100%; overflow-y: auto; background-color: rgba(17, 132, 174, 0.1); border-top-left-radius: 1.5rem; border-bottom-left-radius: 1.5rem;">
+
+            <div>
+                <div v-for="chat in chats" :key="chat.id" @click="getMessage(chat)" class="card"
+                    style="background-color: rgba(100, 100, 100, 0); width: 100%;">
+                    <div class="card-body" style="padding-left: 2rem;">
+                        <h3 class="card-title">{{ chat.assunto }}</h3>
                         <p class="card-text">
                             <strong>Criado em:</strong> {{ chat.criado_em }}
                         </p>
                         <p v-if="chat.linha != null" class="card-text">
                             <strong>Linha:</strong> {{ chat.linha }}
                         </p>
-                        <p class="card-text">
+                        <p class="card-text mb-4">
                             <strong>Status:</strong> {{ chat.chat_status }}
                         </p>
+                        <hr style="margin: 0;">
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Mensagens do Chat -->
-        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3" style="background-color: rgba(0, 0, 0, 0.7); height: calc(100vh - 3.5rem); width: 66.66%;">
+        <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3"
+            style="width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7); border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
             <div class="border-bottom pb-3 mb-3 d-flex flex-row justify-content-between">
-                <h3 class="text-white">Chat ativo</h3>
-                <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">Fechar chat</button>
+                <h3 class="text-white">Assunto: {{ this.chat.assunto }}</h3>
+                <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">
+                    Fechar chat
+                </button>
             </div>
 
-            <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column">
-                <div v-for="mensagem in mensagens" :key="mensagem.id">
-                    <div class="alert" :class="{'alert-secondary': mensagem.chat_id % 2 === 0, 'alert-dark': mensagem.chat_id % 2 !== 0}" style="color: white;">
-                        <span>{{ mensagem.mensagem }}</span>
-                        <div class="text-muted small">Chat ID: {{ mensagem.chat_id }}</div>
+            <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column mb-3">
+                <div v-for="mensagem in mensagens" :key="mensagem.id"
+                    :class="{ 'd-flex justify-content-end': mensagem.admin_id !== null, 'd-flex justify-content-start': mensagem.admin_id === null }"
+                    style="margin-bottom: 0.5rem;">
+                    <div class="alert alert-dark"
+                        style="color: white; display: inline-block; max-width: 70%; word-wrap: break-word; border: none;">
+                        <div class="message-content">
+                            <!-- Rótulo acima da mensagem -->
+                            <div style="color: #6adae9; font-weight: bold;">
+                                {{ mensagem.admin_id !== null ? 'Admin:' : 'Usuário:' }}
+                            </div>
+                            <span>{{ mensagem.mensagem }}</span>
+                            <!-- Horário no canto inferior direito -->
+                            <div style="display: block; text-align: right; color: #AAAAAA; font-size: 12px;">
+                                às {{ formatarData(mensagem.enviado_em) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Input para nova mensagem -->
             <div class="d-flex flex-row justify-content-between" style="width: 100%;">
-                <input class="form-control me-2 my-input" type="text" v-model="novaMensagem" placeholder="Digite sua mensagem">
-                <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar mensagem</button>
+                <input class="form-control me-2 my-input" type="text" maxlength="255" v-model="novaMensagem"
+                    placeholder="Digite sua mensagem">
+                <button @click="mandarMensagem()" class="btn btn-success col-1" :disabled="loading">
+                    <i class="ph ph-paper-plane-right"></i>
+                </button>
             </div>
         </div>
 
         <!-- Placeholder quando nenhum chat está selecionado -->
-        <div v-else class="col-8 d-flex align-items-center justify-content-center h-100">
-            <h1 class="text-white">Acesse um chat para visualizá-lo.</h1>
+        <div v-else class="col-8 d-flex align-items-center justify-content-center h-100"
+            style="background-color: rgba(0, 0, 0, 0.7); border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
+            <div class="text-center">
+                <h1 v-if="this.loadingstats == 0" class="text-white">Acesse um chat para visualizá-lo.</h1>
+                <div v-if="this.loadingstats == 1" class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
         </div>
     </div>
 </template>

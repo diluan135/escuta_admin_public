@@ -131,15 +131,15 @@ export default {
 </script>
 
 <template>
-    <div class="d-flex">
+    <h1 style="margin-right:2.5%; margin-left:5%; margin-top:2.5%" class="lemon-font">Chats abertos</h1>
+    <div class="d-flex Box">
         <!-- Lista de Conversas -->
-        <div class="col-4 p-4 border-end" style="height: calc(100vh - 3.5rem); background-color: rgba(0, 0, 0, 0.7);">
-            <h1 class="mb-4 lemon-font">Chats abertos</h1>
-            <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
+        <div class="col-4" style=" height: 100%; overflow-y: auto; background-color: rgba(17, 132, 174, 0.1); border-top-left-radius: 2.5rem; border-bottom-left-radius: 1.5rem;">
+            <div>
                 <div v-for="chat in chatsAbertos" :key="chat.id" @click="getMessage(chat.id)" class="card"
-                    style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
+                    style="background-color: rgba(100, 100, 100, 0); width: 100%;">
                     <div class="card-body">
-                        <h5 class="card-title">{{ chat.assunto }}</h5>
+                        <h3 class="card-title">{{ chat.assunto }}</h3>
                         <p class="card-text">
                             <strong>Criado em:</strong> {{ chat.criado_em }}
                         </p>
@@ -149,6 +149,7 @@ export default {
                         <p class="card-text">
                             <strong>Status:</strong> {{ chat.chat_status }}
                         </p>
+                        <hr>
                     </div>
                 </div>
             </div>
@@ -156,13 +157,13 @@ export default {
 
         <!-- Mensagens do Chat -->
         <div v-if="mensagens.length" class="col-8 d-flex flex-column p-3"
-            style="height: calc(100vh - 3.5rem); width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7);">
+            style=" width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7);">
             <div class="border-bottom pb-3 mb-3 d-flex flex-row justify-content-between">
                 <h3 class="text-white">Chat ativo</h3>
                 <button @click="fecharChat()" class="btn btn-danger btn-sm" :disabled="loading">Encerrar chat</button>
             </div>
 
-            <div class="d-flex flex-column justify-content-between" style="height: 85%;">
+            <div class="d-flex flex-column justify-content-between" style="height: 90%;">
                 <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column mb-3">
                     <div v-for="mensagem in mensagens" :key="mensagem.id" class="message-container">
                         <div class="alert"
@@ -178,7 +179,7 @@ export default {
                 <div class="d-flex flex-row justify-content-between" style="width: 100%;">
                     <input class="form-control me-2 my-input" type="text" maxlength="255" v-model="novaMensagem"
                         placeholder="Digite sua mensagem">
-                    <button @click="mandarMensagem()" class="btn btn-success col" :disabled="loading">Enviar
+                    <button @click="mandarMensagem()" class="btn btn-success col-2" :disabled="loading">Enviar
                         mensagem</button>
                 </div>
             </div>

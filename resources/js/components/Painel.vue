@@ -11,6 +11,13 @@ export default {
         ...mapState(['enquetes']),
         reversedEnquetes() {
             return [...this.enquetes].reverse();
+        },
+        enquetesAtivas() {
+            return this.enquetes.filter(enquete => new Date(enquete.encerra_em) > new Date());
+        },
+
+        enquetesEncerradas() {
+            return this.enquetes.filter(enquete => new Date(enquete.encerra_em) <= new Date());
         }
     },
     mounted() {
@@ -55,12 +62,13 @@ export default {
                         <div class="col">
                             <h2>Enquetes</h2>
                         </div>
-                        <div class="col text-end">
+                        <div class="col d-flex justify-content-end">
                             <button class="botaoNeon" v-if="!this.exibirEnquetes"
                                 @click="exibirEnquetes = !exibirEnquetes">Exibir Enquetes</button>
                             <button class="botaoNeon" v-else @click="exibirEnquetes = !exibirEnquetes">Ocultar
                                 Enquetes</button>
                         </div>
+
 
                     </div>
 
@@ -87,8 +95,9 @@ export default {
                                         padding: '10px', /* Adicione algum padding para espaçamento interno */
                                         margin: '5px auto' /* Centralize horizontalmente */
                                     }">
-                                        opção: {{ opcao.opcao }}
+                                        {{ opcao.opcao }} | 14 votos
                                     </p>
+                                    <!-- Tenho que puxar o número de votos -->
                                     <p v-if="new Date(enquete.encerra_em) > new Date()">
                                         Aberta até: {{ enquete.encerra_em }}
                                     </p>
@@ -104,15 +113,31 @@ export default {
 
 
                     <!-- estatísticas sobre as enquetes -->
-                    <div v-else>
-                        cu
+                    <div v-else style="overflow-y: none;">
+                        <hr>
+                        <h3 style="font-size: 1.25rem;">Estatísticas das Enquetes</h3>
+                        <p>Total de Enquetes: {{ enquetes.length }}</p>
+                        <p>Enquetes Ativas: {{ enquetesAtivas.length }}</p>
+                        <p>Enquetes Encerradas: {{ enquetesEncerradas.length }}</p>
                     </div>
+
                 </div>
             </div>
 
 
-            <div class="col-3 templateBox">
 
+
+            <div class="col-3 templateBox" style="margin-right:4vw;">
+                <div style="color: #fff; margin: 20px;">
+                    <div class="row">
+                        <div class="col">
+                            <h2>Chats encerrados</h2>
+                        </div>
+                        Colocar uns graficos bem bacanas
+                        <br>colocar chats do ultimo mes, da ultima semana, do ano,
+                        <br>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

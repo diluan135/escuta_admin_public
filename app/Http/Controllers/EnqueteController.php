@@ -17,6 +17,8 @@ class EnqueteController extends Controller
         }
         return $data;
     }
+
+    
     public function criarEnquete(Request $request)
     {
         // Criando a enquete e armazenando a instância criada

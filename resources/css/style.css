@@ -146,7 +146,7 @@ h2 {
 }
 
 .my-input {
-    background-color: #003f52;
+    background-color: #003f52; /* Cor de fundo inicial */
     color: white;
     border-radius: 13px;
     border: 0 solid #ccc;
@@ -170,10 +170,11 @@ h2 {
     border: 0 solid transparent;
     box-shadow: 0 0px 4px rgba(0, 0, 0, 0.5);
     outline: none;
+    background-color: #003f52; /* Garante que o fundo não mude no foco */
 }
 
 .my-input:-webkit-autofill {
-    background-color: #003f52 !important;
+    background-color: #003f52 !important; /* Garante a cor de fundo mesmo em autofill */
     color: white !important;
     -webkit-box-shadow: 0 0 0px 1000px #003f52 inset !important;
     box-shadow: 0 0 0px 1000px #003f52 inset !important;
@@ -191,6 +192,7 @@ h2 {
     color: #003f52;
     opacity: 1;
 }
+
 
 .toggle-password {
     position: absolute;

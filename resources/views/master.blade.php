@@ -19,6 +19,7 @@ include(base_path('app/Http/verifica_conexao.php'));
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <title>Painel ADM</title>
 </head>
 

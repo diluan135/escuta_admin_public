@@ -20,6 +20,7 @@ export default {
             novoTitulo: '', // Armazena o novo título durante a edição
             publicarStatus: [], // Armazena o status de publicação das mensagens
             avisoPublicar: false, // Aviso para verificar as mensagens antes de publicar
+            loadingstats: 0,
         };
     },
     computed: {
@@ -34,7 +35,7 @@ export default {
             console.log('entrou');
             this.editarMensagens = false;
             this.avisoPublicar = false;
-
+            this.loadingstats = 1;
             try {
                 const response = await axios.get('/api/FAQ/mensagensPublicadas', {
                     params: { chat_id: chat.id }
@@ -47,6 +48,7 @@ export default {
                 this.chatLinha = chat.linha;
                 this.publicarStatus = this.mensagensFAQ.map(() => true); // Inicializa com todas as mensagens publicáveis
                 console.log(response);
+                this.loadingstats = 0;
             } catch (error) {
                 console.error('Erro ao obter mensagens do FAQ:', error);
             }
@@ -139,7 +141,7 @@ export default {
                 });
 
                 console.log(response.data.message);
-                
+
             } catch (error) {
                 if (error.response && error.response.status === 400) {
                     console.error('Erro:', error.response.data.message);
@@ -158,7 +160,7 @@ export default {
             this.getMensagensFAQ(this.chatSelecionado);
 
             // davi coloque um balãozinho com notificação que deu certo a alteração das mensagens aqui:
-            
+
         },
         cancelarPublicarChat() {
             this.avisoPublicar = false;
@@ -177,13 +179,14 @@ export default {
         <div class="col-4 p-4 border-end" style="height: calc(100vh - 3.5rem); background-color: rgba(0, 0, 0, 0.7);">
             <h1 class="mb-4">FAQ</h1>
             <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
-                <div v-for="chat in faq" :key="chat.id" class="card" @click="getMensagensFAQ(chat)" style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
+                <div v-for="chat in faq" :key="chat.id" class="card" @click="getMensagensFAQ(chat)"
+                    style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
                     <div class="card-body">
                         <h5 class="card-title">{{ chat.assunto }}</h5>
                         <p class="card-text">
                             <strong>Criado em:</strong> {{ chat.criado_em }}<br>
                             <span v-if="chat.linha"><strong>Linha:</strong> {{ chat.linha }}</span><br>
-                            <span v-if="chat.publicado == 1" class="badge bg-success">Publicado</span>
+                            <span v-if="chat.publicado == 1" class="badge bg-success mb-4">Publicado</span>
                         </p>
                         <!-- <button @click="getMensagensFAQ(chat)" class="btn btn-primary">Acessar mensagens do FAQ</button> -->
                     </div>
@@ -192,9 +195,11 @@ export default {
         </div>
 
         <!-- Mensagens do FAQ -->
-        <div v-if="chatSelecionado" class="col-8 d-flex flex-column p-3" style="height: calc(100vh - 3.5rem); width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7);">
+        <div v-if="chatSelecionado" class="col-8 d-flex flex-column p-3"
+            style="height: calc(100vh - 3.5rem); width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7);">
             <div v-if="avisoPublicar" class="alert alert-warning">
-                Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas e/ou palavras erradas e de baixo calão!
+                Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas e/ou palavras erradas e de
+                baixo calão!
             </div>
 
             <!-- Edição de Título -->
@@ -203,7 +208,8 @@ export default {
                     <h2 class="text-white">{{ chatAssunto }}</h2>
                     <div>
                         <button class="btn btn-secondary me-2" @click="editarTitulo">Editar título</button>
-                        <button class="btn btn-info" @click="modoPublicarChat()" :disabled="loading">Editar chat</button>
+                        <button class="btn btn-info" @click="modoPublicarChat()" :disabled="loading">Editar
+                            chat</button>
                     </div>
                 </div>
                 <div v-else class="d-flex">
@@ -216,14 +222,15 @@ export default {
             <!-- Lista de Mensagens -->
             <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column mt-4">
                 <div v-if="!editarMensagens">
-                    <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id" class="alert alert-secondary text-white mb-3">
+                    <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id"
+                        class="alert alert-secondary text-white mb-3">
                         <div v-if="mensagem.admin_id" class="d-flex justify-content-between">
                             <span><strong>Admin {{ mensagem.admin_id }}:</strong> {{ mensagem.mensagem }}</span>
-                            <span><strong>Publicado:</strong> {{ mensagem.publicado }}</span>
+                            <span><strong>{{ mensagem.publicado ? 'Publicado' : 'Não publicado' }}</strong></span>
                         </div>
                         <div v-else class="d-flex justify-content-between">
                             <span><strong>Usuário:</strong> {{ mensagem.mensagem }}</span>
-                            <span><strong>Publicado:</strong> {{ mensagem.publicado }}</span>
+                            <span><strong>{{ mensagem.publicado ? 'Publicado' : 'Não publicado' }}</strong></span>
                         </div>
                     </div>
                 </div>
@@ -231,14 +238,16 @@ export default {
                 <!-- Modo de Edição das Mensagens -->
                 <div v-else>
                     <label class="form-check mb-3">
-                        <input type="checkbox" :checked="chatPublicado == 1" class="form-check-input" @change="chatPublicadoTemp = !chatPublicadoTemp">
+                        <input type="checkbox" :checked="chatPublicado == 1" class="form-check-input"
+                            @change="chatPublicadoTemp = !chatPublicadoTemp">
                         <span class="form-check-label">Chat publicado?</span>
                     </label>
 
                     <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id" class="alert alert-dark mb-3">
                         <input v-model="mensagem.mensagem" class="form-control mb-2" />
                         <label class="form-check">
-                            <input type="checkbox" :checked="mensagem.publicado == 1" v-model="publicarStatus[index]" class="form-check-input" />
+                            <input type="checkbox" :checked="mensagem.publicado == 1" v-model="publicarStatus[index]"
+                                class="form-check-input" />
                             <span class="form-check-label">Publicar</span>
                         </label>
                     </div>
@@ -247,15 +256,22 @@ export default {
 
             <!-- Botões de Ação -->
             <div v-if="editarMensagens" class="d-flex justify-content-end mt-3">
-                <button @click="cancelarPublicarChat()" class="btn btn-danger me-2" :disabled="loading">Cancelar</button>
-                <button @click="publicarMensagensFAQ()" class="btn btn-success" :disabled="loading">Salvar alterações</button>
+                <button @click="cancelarPublicarChat()" class="btn btn-danger me-2"
+                    :disabled="loading">Cancelar</button>
+                <button @click="publicarMensagensFAQ()" class="btn btn-success" :disabled="loading">Salvar
+                    alterações</button>
             </div>
         </div>
 
         <!-- Placeholder quando nenhum chat está selecionado -->
-        <div v-else class="col-8 d-flex align-items-center justify-content-center h-100">
-            <h1 class="text-white">Acesse uma FAQ para visualizá-la.</h1>
+        <div v-else class="col-8 d-flex align-items-center justify-content-center"
+            style="background-color: rgba(0, 0, 0, 0.7); border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem; height: 100vh;">
+            <div class="text-center">
+                <h1 v-if="this.loadingstats == 0" class="text-white">Acesse um chat para visualizá-lo.</h1>
+                <div v-if="this.loadingstats == 1" class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
         </div>
     </div>
 </template>
-

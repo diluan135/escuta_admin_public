@@ -150,8 +150,8 @@ export default {
 </style>
 
 <template>
-    <div style="padding-left:4%; padding-right: 4%; padding-top: 2%; overflow-y: auto;">
-        <div class="row" style="height: calc(100vh - 5rem);">
+    <div style="padding-left:4%; padding-right: 4%; padding-top: 2%; overflow-y: auto; height: calc(100vh - 5rem);">
+        <div class="row" style="">
 
             <!-- ----------------------------------- TABELONA GRANDE --------------------------------------- -->
             <div class="row" style=" color:white; margin-bottom: 4vh;">
@@ -169,7 +169,7 @@ export default {
             </div>
 
             <!-- Enquetes -->
-            <div class="col-4 templateBox" style="margin-right:3vw;">
+            <div class="col-4 templateBox mb-4" style="margin-right:3vw;">
                 <div style="color: #fff; margin: 20px;">
                     <div class="row">
                         <div class="col">

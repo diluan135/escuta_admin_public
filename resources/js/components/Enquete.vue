@@ -7,7 +7,10 @@ export default {
         return {
             titulo: '',
             descricao: '',
-            opcoes: [],
+            opcoes: [
+                { texto: '', cor: '#ffffff' },
+                { texto: '', cor: '#ffffff' }
+            ],
             numOpcoes: 2,
             encerra_em: new Date().toISOString().slice(0, 16) // Definindo o valor inicial com o formato correto
         }
@@ -84,12 +87,10 @@ export default {
             <div class="row mb-2 p-0">
 
                 <div class="col-8" style="max-height: 5rem; overflow-y: auto;">
-                    <div v-for="(opcao, index) in numOpcoes" :key="index" class="mb-1 position-relative">
+                    <div v-for="(opcao, index) in opcoes" :key="index" class="mb-1 position-relative">
                         <div class="input-wrapper d-flex flex-row gap-3">
-                            <input type="text" v-model="opcoes[index]" :placeholder="`Opção #${index + 1}`"
-                                class="my-input white">        
-                            <button v-if="numOpcoes > 2" @click="removerOpcao(index)" class="remove-btn"
-                                style="margin-right: 3.5rem;">
+                            <input type="text" v-model="opcao.texto" :placeholder="`Opção #${index + 1}`" class="my-input white">        
+                            <button v-if="opcoes.length > 2" @click="removerOpcao(index)" class="remove-btn" style="margin-right: 3.5rem;">
                                 <i class="fas fa-trash"></i>                               
                             </button>
                             <input id="color-input" type="color" v-model="opcao.cor" style="margin-top: 0.3rem;">
@@ -105,7 +106,7 @@ export default {
             </div>
 
             <div class="d-flex flex-row justify-content-between">
-                <button @click="numOpcoes++" class="btn btn-link p-0">Adicionar opção</button>
+                <button @click="adicionarOpcao" class="btn btn-link p-0">Adicionar opção</button>
                 <button @click="criarEnquete" class="botao azul ms-auto" style="margin-right: 0.7rem;">Enviar</button>
             </div>
         </div>

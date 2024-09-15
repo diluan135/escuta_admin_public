@@ -39,6 +39,7 @@ export default {
     methods: {
         ...mapActions(['fetchChatsAbertos']),
         async getMessage(chat) {
+            this.mensagens = [];
             this.chat = chat;
             this.loadingstats = 1;
             try {

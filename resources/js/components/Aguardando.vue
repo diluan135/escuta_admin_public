@@ -22,6 +22,7 @@ export default {
     methods: {
         ...mapActions(['fetchChats']),
         async getMessage(chat) {
+            this.mensagens = [];
             this.chat = chat;
             this.loadingstats = 1;
             try {

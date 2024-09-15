@@ -11,17 +11,17 @@ export default {
                 { texto: '', cor: '#ffffff' },
                 { texto: '', cor: '#ffffff' }
             ],
+            loadingstats: 0,
             numOpcoes: 2,
             encerra_em: new Date().toISOString().slice(0, 16) // Definindo o valor inicial com o formato correto
         }
     },
     methods: {
         async criarEnquete() {
+            this.loadingstats = 1;
             try {
                 // Já formatado corretamente, apenas utilizar
                 const formattedEncerraEm = this.encerra_em;
-
-                // Davi, acho que é interessante colocar um loading quando iniciar essa função porque ela está demorando pra ser finalizada, e ao terminar tirar o estado de loading, você pode criar uma variável no data como loading e deixar como falso, e iniciar o loading na hora que o botão for clicado iniciando uma animaçãozinha de loading
 
                 // Garantir que as opções tenham o formato correto
                 const opcoesFormatadas = this.opcoes.map(opcao => ({
@@ -46,8 +46,8 @@ export default {
                 this.numOpcoes = 1;
                 this.encerra_em = new Date().toISOString().slice(0, 16); // Resetando para o formato correto
                 console.log('Enquete criada com sucesso!');
-
-                // davi, quando chegar aqui você só desativa a variável de loading
+                this.loadingstats = 0;
+                alert('Enquete criada com sucesso!')
             }
         },
         adicionarOpcao() {
@@ -89,7 +89,7 @@ export default {
                 <div class="col-8" style="max-height: 5rem; overflow-y: auto;">
                     <div v-for="(opcao, index) in opcoes" :key="index" class="mb-1 position-relative">
                         <div class="input-wrapper d-flex flex-row gap-3">
-                            <input type="text" v-model="opcao.texto" :placeholder="`Opção #${index + 1}`" class="my-input white">        
+                            <input type="text" v-model="opcao.texto" :placeholder="`Opção #${index + 1}`" class="my-input">        
                             <button v-if="opcoes.length > 2" @click="removerOpcao(index)" class="remove-btn" style="margin-right: 3.5rem;">
                                 <i class="fas fa-trash"></i>                               
                             </button>
@@ -107,7 +107,7 @@ export default {
 
             <div class="d-flex flex-row justify-content-between">
                 <button @click="adicionarOpcao" class="btn btn-link p-0">Adicionar opção</button>
-                <button @click="criarEnquete" class="botao azul ms-auto" style="margin-right: 0.7rem;">Enviar</button>
+                <button @click="criarEnquete" class="botao azul ms-auto" style="margin-right: 0.7rem;">{{ this.loadingstats ? 'Criando...' : 'Criar'}}</button>
             </div>
         </div>
     </div>

@@ -28,6 +28,7 @@ export default {
     methods: {
         ...mapActions(['fetchChatsFechados']),
         async getMessage(chat) {
+            this.mensagens = [];
             this.chat = chat;
             this.loadingstats = 1;
             const response = await axios.get('/api/mensagem', {

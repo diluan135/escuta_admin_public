@@ -33,6 +33,7 @@ export default {
         ...mapActions(['fetchFAQ']),
         async getMensagensFAQ(chat) {
             console.log('entrou');
+            this.chatSelecionado = 0;
             this.editarMensagens = false;
             this.avisoPublicar = false;
             this.loadingstats = 1;

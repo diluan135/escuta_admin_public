@@ -12,6 +12,7 @@ export default {
         return {
             exibirEnquetes: false,
             exibirUsuarios: false,
+            periodoAtual: 'Últimos 7 dias',
         }
     },
     computed: {
@@ -62,6 +63,73 @@ export default {
             contarLinhas(this.chatsFechados);
 
             return contagemLinhas;
+        },
+        contagensTipos() {
+            const contagemTipos = {};
+
+            // Função para normalizar os tipos
+            const normalizarTipo = (tipo) => {
+                if (tipo) {
+                    tipo = tipo.toLowerCase().trim(); // Normaliza para minúsculas e remove espaços
+                    if (['horários', 'horario'].includes(tipo)) {
+                        return 'Horários';
+                    }
+                    if (['sugestão'].includes(tipo)) {
+                        return 'Sugestão';
+                    }
+                    if (['reclamação'].includes(tipo)) {
+                        return 'Reclamação';
+                    }
+                    else {
+                        return 'Outros';
+                    }
+                }
+                return 'Outros';
+            };
+
+            // Função para filtrar chats com base no período
+            const filtrarPorPeriodo = (chatsArray) => {
+                const agora = new Date();
+                return chatsArray.filter(chat => {
+                    const dataChat = new Date(chat.criado_em);
+                    switch (this.periodoAtual) {
+                        case 'Últimos 7 dias':
+                            return (agora - dataChat) <= (7 * 24 * 60 * 60 * 1000);
+                        case 'Último mês':
+                            return (agora - dataChat) <= (30 * 24 * 60 * 60 * 1000);
+                        case 'Última semana':
+                            return (agora - dataChat) <= (7 * 24 * 60 * 60 * 1000);
+                        case 'Último ano':
+                            return (agora - dataChat) <= (365 * 24 * 60 * 60 * 1000);
+                        case 'Último dia':
+                            return (agora - dataChat) <= (24 * 60 * 60 * 1000);
+                        default:
+                            return true;
+                    }
+                });
+            };
+
+            // Helper function to contar os tipos
+            const contarTipos = (chatsArray) => {
+                const chatsFiltrados = filtrarPorPeriodo(chatsArray);
+                chatsFiltrados.forEach(chat => {
+                    const tipo = normalizarTipo(chat.tipo);
+                    if (tipo) {
+                        if (contagemTipos[tipo]) {
+                            contagemTipos[tipo]++;
+                        } else {
+                            contagemTipos[tipo] = 1;
+                        }
+                    }
+                });
+            };
+
+            // Contar tipos dos chats
+            contarTipos(this.chats);
+            contarTipos(this.chatsAbertos);
+            contarTipos(this.chatsFechados);
+
+            return contagemTipos;
         },
         barChartData() {
             const labels = Object.keys(this.chatsLinhas);
@@ -120,6 +188,12 @@ export default {
     mounted() {
     },
     methods: {
+        alternarPeriodo() {
+            const periodos = ['Últimos 7 dias', 'Último mês', 'Último ano', 'Último dia'];
+            const indexAtual = periodos.indexOf(this.periodoAtual);
+            const proximoIndex = (indexAtual + 1) % periodos.length;
+            this.periodoAtual = periodos[proximoIndex];
+        },
         toggleEnquete(id) {
             const enquete = this.reversedEnquetes.find(enquete => enquete.id === id);
             if (enquete) {
@@ -176,9 +250,11 @@ export default {
                             <h2>Enquetes</h2>
                         </div>
                         <div class="col d-flex justify-content-end">
-                            <button class="botaoNeon" v-if="!this.exibirEnquetes"
-                                @click="exibirEnquetes = !exibirEnquetes">Exibir Enquetes</button>
-                            <button class="botaoNeon" v-else @click="exibirEnquetes = !exibirEnquetes">Ocultar
+                            <button class="botao azul" style="box-shadow: none; width: auto; font-size: 14px;"
+                                v-if="!this.exibirEnquetes" @click="exibirEnquetes = !exibirEnquetes">Exibir
+                                Enquetes</button>
+                            <button class="botao azul" style="box-shadow: none; width: auto; font-size: 14px;" v-else
+                                @click="exibirEnquetes = !exibirEnquetes">Ocultar
                                 Enquetes</button>
                         </div>
                     </div>
@@ -237,17 +313,26 @@ export default {
 
 
 
-
-            <div class="col-4 templateBox" style="margin-right:3vw;">
+            <!-- --------------------------- Chats ---------------------------------- -->
+            <div class="col-4 templateBox" style="margin-right: 3vw;">
                 <div style="color: #fff; margin: 20px;">
                     <div class="row">
                         <div class="col">
-                            <h2>Chats encerrados</h2>
+                            <h2>Assuntos</h2>
                         </div>
-                        Colocar uns graficos bem bacanas
-                        <br>colocar chats do ultimo mes, da ultima semana, do ano,
-                        <br>
+                        <div class="col d-flex justify-content-end">
+                            <button class="botao azul" style="box-shadow: none; width: auto; font-size: 14px;"
+                                @click="alternarPeriodo">{{ periodoAtual }} <i style="margin-left:4px; rotate: 90deg;"class="fa-solid fa-arrow-right-arrow-left"></i>
+                            </button>
+                        </div>
                     </div>
+                    <div style="color: #fff;">
+                        <hr>
+                        <div v-for="(contagem, tipo) in contagensTipos" :key="tipo" style="color: #fff;">
+                            {{ tipo }} : {{ contagem }}
+                        </div>
+                    </div>
+                    <br>
                 </div>
             </div>
 
@@ -259,9 +344,11 @@ export default {
                             <h2>Usuários</h2>
                         </div>
                         <div class="col d-flex justify-content-end">
-                            <button class="botaoNeon" v-if="!this.exibirUsuarios"
-                                @click="exibirUsuarios = !exibirUsuarios">Exibir usuarios</button>
-                            <button class="botaoNeon" v-else @click="exibirUsuarios = !exibirUsuarios">Ocultar</button>
+                            <button class="botao azul" style="box-shadow: none; width: auto; font-size: 14px;"
+                                v-if="!this.exibirUsuarios" @click="exibirUsuarios = !exibirUsuarios">Exibir
+                                usuarios</button>
+                            <button class="botao azul" style="box-shadow: none; width: auto; font-size: 14px;" v-else
+                                @click="exibirUsuarios = !exibirUsuarios">Ocultar</button>
                         </div>
                         <div style="color: #fff;" v-if="this.exibirUsuarios">
                             <hr>

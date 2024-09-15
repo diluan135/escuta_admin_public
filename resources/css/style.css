@@ -9,7 +9,7 @@
     height: 40vh;
     overflow-y: auto;
     width: 30vw;
-    background: rgb(20, 25, 50, 0.8);
+    background: rgb(20, 25, 50, 0.7);
     border-radius: 1.5rem;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
 }

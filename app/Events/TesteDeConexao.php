@@ -20,8 +20,6 @@ class TesteDeConexao implements ShouldBroadcast
     {
         $this->mensagem = $mensagem;
 
-        // Adiciona um log para verificar se o evento foi disparado com a mensagem correta
-        Log::info('Evento TesteDeConexao disparado com a mensagem: ' . $this->mensagem);
     }
 
     public function broadcastOn()

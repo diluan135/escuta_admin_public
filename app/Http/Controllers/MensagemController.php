@@ -50,10 +50,7 @@ class MensagemController extends Controller
             ]);
             
             $usuario = Usuario::find($chat->usuario_id);
-            Log::info($usuario);
             $mensagem->usuario = $usuario->id;
-            Log::info($mensagem);
-            // Log::info('mensagem:', $mensagem);
             broadcast(new MensagemEnviada($mensagem, $usuario->id))->toOthers();
 
             // Verifica a última mensagem enviada (de qualquer pessoa) no chat

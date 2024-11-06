@@ -61,7 +61,6 @@ export default {
             }
 
             this.loading = true;
-            console.log(this.chatSelecionado, this.chatTipo, this.chatAssunto, this.chatLinha);
 
             const mensagensPublicaveis = this.mensagens.map((mensagem, index) => ({
                 admin_id: mensagem.admin_id,

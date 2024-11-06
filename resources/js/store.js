@@ -55,7 +55,6 @@ const store = createStore({
             state.usuarios = usuarios;
         },
         setMensagensRecebidas(state, mensagensRecebidas) {
-            console.log('setMensagensRecebidas chamada:', mensagensRecebidas);
             state.mensagensRecebidas = mensagensRecebidas;
         },
         adicionarMensagem(state, evento) {
@@ -65,7 +64,6 @@ const store = createStore({
             if (chat) {
                 chat.mensagens = chat.mensagens || [];
                 chat.mensagens.push(evento.mensagem);
-                console.log('Mensagem adicionada ao chat:', chat);
 
                 // Adiciona a mensagem à lista de mensagens recebidas
                 state.mensagensRecebidas.push(evento);
@@ -139,10 +137,8 @@ const store = createStore({
             }
         },
         initListener({ dispatch }) {
-            console.log('Echo instance:', window.Echo);
             window.Echo.channel('escuta')
                 .listen('.escuta', (event) => {
-                    console.log('Mensagem recebida:', event);
                     dispatch('handleIncomingMessage', event.message);
                 });
         },

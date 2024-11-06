@@ -56,7 +56,6 @@ export default {
                         this.opcoes = [];
                         this.numOpcoes = 1;
                         this.encerra_em = new Date().toISOString().slice(0, 16); // Resetando para o formato correto
-                        console.log('Enquete criada com sucesso!');
                         this.loadingstats = 0;
                         alert('Enquete criada com sucesso!')
                     }

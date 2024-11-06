@@ -23,7 +23,6 @@ class MyEvent implements ShouldBroadcast
 
     public function __construct($message)
     {
-        log::info($message);
         $this->message = $message;
     }
 
@@ -34,13 +33,11 @@ class MyEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        log::info('broadcastOn');
         return ['my-channel'];
     }
 
     public function broadcastAs()
     {
-        log::info('broadcastAs');
         return 'my-event';
     }
 }

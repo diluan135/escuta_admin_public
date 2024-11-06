@@ -17,7 +17,6 @@ export default {
     methods: {
         ...mapMutations(['setCurrentView']),
         clickHandler() {
-            console.log('click');
             this.$router.push('/teste');
         },
         settipoSolicitacao(tipoSolicitacao) {
@@ -27,7 +26,6 @@ export default {
             try {
                 const response = await axios.get('/api/user'); // Rota para obter informações do usuário
                 this.user = response.data;
-                console.log(this.user.id);
             } catch (error) {
                 console.error('Failed to fetch user', error);
             }
@@ -36,7 +34,6 @@ export default {
             try {
                 const response = await axios.get('/api/linhas');
                 this.linhasData = response.data.map(item => item.nome);
-                console.log(this.linhasData);
             } catch (error) {
                 console.error('Failed to fetch Linhas data', error);
             }
@@ -47,7 +44,6 @@ export default {
         },
 
         enviar() {
-            console.log('usuario: ', this.user.id, 'assunto: ', this.assunto, 'mensagem: ', this.mensagem, 'linha selecionada: ', this.linhaSelecionada, 'tipo: ', this.tipo, 'tipoSolicitação: ', this.tipoSolicitacao);
             axios.post('/api/chat/newChat',
                 {
                     usuario_id: this.user.id,
@@ -57,8 +53,6 @@ export default {
                 }
             )
                 .then(response => {
-                    console.log(response.data);
-                    console.log(response.data.id);
                     axios.post('api/mensagem/enviarMensagem',
                         {
                             usuario_id: this.user.id,

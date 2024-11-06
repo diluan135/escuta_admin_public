@@ -60,9 +60,7 @@ class ChatController extends Controller
 
     public function marcarVisualizado(Request $request){
         $chat = Chat::find($request->input('chat_id'));
-        Log::info($chat);
         $chat->update(['visualizado_adm' => 0]);
-        Log::info('após update: ' . $chat);
 
         return response()->json('Chat visualizado com sucesso', 200);
     }

@@ -49,7 +49,6 @@ export default {
                 const response = await axios.post('/api/chat/visualizar', {
                     chat_id: chat.id,
                 });
-                console.log('Mensagem visualizada:', response.data);
             } catch (error) {
                 console.error('Erro ao marcar como chat visualizado')
             }
@@ -97,7 +96,6 @@ export default {
                     chat_id: this.chatSelecionado,
                     mensagem: this.novaMensagem,
                 });
-                console.log('Mensagem enviada:', response.data);
                 this.novaMensagem = '';
 
                 // Chama a função adicionarMensagem com a nova mensagem enviada
@@ -140,7 +138,6 @@ export default {
                 const response = await axios.post('/api/chat/fecharChat', {
                     chat_id: this.chatSelecionado,
                 });
-                console.log('Chat fechado:', response.data);
                 this.chatSelecionado = null;
                 this.mensagens = [];
                 this.loadingstats = 0;
@@ -167,23 +164,18 @@ export default {
     },
     mounted() {
         this.fetchChatsAbertos();
-        console.log('chegou aq');
         const tokenCSRF = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        console.log('Token CSRF:', tokenCSRF);
     },
     watch: {
         mensagensRecebidas(newMensagens) {
-            console.log('entrou no new mensagens');
 
             const ultimaMensagem = newMensagens[newMensagens.length - 1];
             if (ultimaMensagem) {
-                console.log('Mensagens por chat atualizadas:', this.mensagensPorChat);
 
                 const chatId = ultimaMensagem.chat_id;
                 const chat = this.sortedChats.find(chat => chat.id === chatId);
 
                 if (chat) {
-                    console.log('encontrou o chat');
                     chat.ultima_mensagem_em = ultimaMensagem.enviado_em;
                     if(this.chatSelecionado != chatId)
                         chat.visualizado_adm = 1;
@@ -193,7 +185,6 @@ export default {
                 // Chama a função adicionarMensagem com a última mensagem recebida
             }
 
-            console.log('Mensagens por chat atualizadas:', this.mensagensPorChat);
         },
     }
 };

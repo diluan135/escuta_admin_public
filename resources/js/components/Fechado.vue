@@ -16,11 +16,12 @@ export default {
             loadingstats: 0,
             avisoPublicar: false,
             editarMensagens: false,
-            publicarStatus: []  // Armazena o status de publicação das mensagens
+            publicarStatus: [],  // Armazena o status de publicação das mensagens
+            usuarioSelecionado: null,
         };
     },
     computed: {
-        ...mapState(['chatsFechados', 'user']),
+        ...mapState(['chatsFechados', 'usuarios']),
         idServidor() {
             return window.idServidor;
         }
@@ -31,6 +32,9 @@ export default {
             this.mensagens = [];
             this.chat = chat;
             this.loadingstats = 1;
+            // Define o usuarioSelecionado com base no chat.usuario_id
+            const usuario = this.usuarios.find(usuario => usuario.id === chat.usuario_id);
+            this.usuarioSelecionado = usuario;
             const response = await axios.get('/api/mensagem', {
                 params: { chat_id: chat.id }
             });
@@ -158,7 +162,9 @@ export default {
                             <div class="message-content">
                                 <!-- Rótulo acima da mensagem -->
                                 <div style="color: #6adae9; font-weight: bold;">
-                                    {{ mensagem.admin_id !== null ? 'Admin:' : 'Usuário:' }}
+                                    {{ mensagem.admin_id !== null ? 'Admin' : (usuarioSelecionado ?
+                                        usuarioSelecionado.name
+                                        : 'Usuário') }}
                                 </div>
                                 <span v-if="!editarMensagens">{{ mensagem.mensagem }}</span>
                                 <div v-else>

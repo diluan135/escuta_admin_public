@@ -32,7 +32,6 @@ export default {
     methods: {
         ...mapActions(['fetchFAQ']),
         async getMensagensFAQ(chat) {
-            console.log('entrou');
             this.chatSelecionado = 0;
             this.editarMensagens = false;
             this.avisoPublicar = false;
@@ -48,7 +47,6 @@ export default {
                 this.chatAssunto = chat.assunto;
                 this.chatLinha = chat.linha;
                 this.publicarStatus = this.mensagensFAQ.map(() => true); // Inicializa com todas as mensagens publicáveis
-                console.log(response);
                 this.loadingstats = 0;
             } catch (error) {
                 console.error('Erro ao obter mensagens do FAQ:', error);
@@ -76,14 +74,13 @@ export default {
             // Se o título for válido, atualiza o título localmente e envia ao backend
             if (this.novoTitulo !== this.chatAssunto) {
                 this.chatAssunto = this.novoTitulo; // Atualiza o título localmente
-                console.log(this.chatSelecionado, this.novoTitulo);
 
                 await axios.post('/api/FAQ/editarTitulo', {
                     chat_id: this.chatSelecionado,
                     novo_titulo: this.novoTitulo
                 })
                     .then(response => {
-                        console.log('Título atualizado com sucesso:', response.data.message);
+                        // console.log('Título atualizado com sucesso:', response.data.message);
                     })
                     .catch(error => {
                         console.error('Erro ao atualizar o título:', error);
@@ -140,9 +137,6 @@ export default {
                     mensagens: mensagensPublicaveis,
                     chat_id: this.chatSelecionado,
                 });
-
-                console.log(response.data.message);
-
             } catch (error) {
                 if (error.response && error.response.status === 400) {
                     console.error('Erro:', error.response.data.message);

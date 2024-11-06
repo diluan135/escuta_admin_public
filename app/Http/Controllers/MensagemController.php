@@ -40,6 +40,21 @@ class MensagemController extends Controller
             // Atualiza o status do chat para 'Aberto'
             $chat = Chat::find($validatedData['chat_id']);
             $chat->update(['chat_status' => 'Aberto']);
+            $chat->update(['visualizado_usuario' => 1]);
+
+            
+            $mensagem = Mensagem::create([
+                'admin_id' => $validatedData['admin_id'],
+                'chat_id' => $validatedData['chat_id'],
+                'mensagem' => $validatedData['mensagem'],
+            ]);
+            
+            $usuario = Usuario::find($chat->usuario_id);
+            Log::info($usuario);
+            $mensagem->usuario = $usuario->id;
+            Log::info($mensagem);
+            // Log::info('mensagem:', $mensagem);
+            broadcast(new MensagemEnviada($mensagem, $usuario->id))->toOthers();
 
             // Verifica a última mensagem enviada (de qualquer pessoa) no chat
             $ultimaMensagem = Mensagem::where('chat_id', $chat->id)
@@ -47,34 +62,12 @@ class MensagemController extends Controller
                 ->first();
 
             // Criação da mensagem
-            $mensagem = Mensagem::create([
-                'admin_id' => $validatedData['admin_id'],
-                'chat_id' => $validatedData['chat_id'],
-                'mensagem' => $validatedData['mensagem'],
-            ]);
-
-            // Emitir evento via WebSocket
-            broadcast(new MensagemEnviada($mensagem))->toOthers();
-
-            // if ($ultimaMensagem) { // Isso aqui é só pra log
-            //     $ultimaMensagemEnviadoEm = Carbon::parse($ultimaMensagem->enviado_em);
-            //     $tempoDecorrido = now()->diffInMinutes($ultimaMensagemEnviadoEm);
-
-            //     Log::info('Verificando a última mensagem:', [
-            //         'timestamp_atual' => now()->toDateTimeString(),
-            //         'ultima_mensagem_enviada_em' => $ultimaMensagem->enviado_em,
-            //         'tempo_decorrido' => $tempoDecorrido, // Adicionado para depuração
-            //         'usuario_id' => $ultimaMensagem->usuario_id,
-            //         'admin_id' => $ultimaMensagem->admin_id,
-            //     ]);
-            // }
 
             if (
                 !$ultimaMensagem ||
                 $ultimaMensagem->admin_id === null ||
-                now()->diffInMinutes(Carbon::parse($ultimaMensagem->enviado_em)) < -1 //Eu não sei porque mas o diffInMinutes tava sempre saindo negativo, e não consegui inverter isso, por isso esse valor "< -15" significa que ele tem que passar de 15 minutos para mandar outro email, se alguém no futuro estiver vendo este código, me desculpa por ser burro
+                now()->diffInMinutes(Carbon::parse($ultimaMensagem->enviado_em)) < -1 
             ) {
-                $usuario = Usuario::find($chat->usuario_id);
 
                 // Envia o email para o usuário
                 Mail::to($usuario->email)->send(new AvisoRespostaChat($chat));
@@ -86,4 +79,5 @@ class MensagemController extends Controller
             return response()->json(['error' => 'Erro ao enviar mensagem.'], 500);
         }
     }
+    
 }

@@ -7,7 +7,7 @@ $_SESSION['nivel_acesso'] = 'adm';
 $_SESSION['nivel_agencia'] = 0;
 $_SESSION['adm'] = 1;
 
-include(base_path('app/Http/verifica_conexao.php'));
+include base_path('app/Http/verifica_conexao.php');
 ?>
 
 <!DOCTYPE html>
@@ -18,8 +18,8 @@ include(base_path('app/Http/verifica_conexao.php'));
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="{{ asset('assets/fontawesome/css/all.min.css') }}">
+    <script src="{{ asset('assets/phosphor/phosphor.js') }}"></script>
     <title>Painel ADM</title>
 </head>
 
@@ -33,6 +33,7 @@ include(base_path('app/Http/verifica_conexao.php'));
         window.nomeServidor = "{{ $_SESSION['nomeServidor'] }}";
         window.idServidor = "{{ $_SESSION['idServidor'] }}";
     </script>
+    
 </body>
 
 <style>

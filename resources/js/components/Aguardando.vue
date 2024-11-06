@@ -11,12 +11,18 @@ export default {
             chatSelecionado: null,
             loading: false,
             loadingstats: 0,
+            usuarioSelecionado: null,
         }
     },
     computed: {
-        ...mapState(['chats', 'user']),
+        ...mapState(['chats', 'usuarios', 'mensagensRecebidas']),
         idServidor() {
             return window.idServidor;
+        },
+        sortedChats() {
+            return this.chats.slice().sort((a, b) => {
+                return new Date(b.ultima_mensagem_em) - new Date(a.ultima_mensagem_em);
+            });
         }
     },
     methods: {
@@ -25,23 +31,22 @@ export default {
             this.mensagens = [];
             this.chat = chat;
             this.loadingstats = 1;
+
+            // Define o usuarioSelecionado com base no chat.usuario_id
+            const usuario = this.usuarios.find(usuario => usuario.id === chat.usuario_id);
+            this.usuarioSelecionado = usuario;
+
             try {
                 const response = await axios.get('/api/mensagem', {
                     params: { chat_id: chat.id },
                 });
                 this.mensagens = response.data;
                 this.chatSelecionado = chat.id;
-
-                // Reconfigura o canal para o chat selecionado
-                window.Echo.channel('chat.' + chat.id)
-                    .listen('MensagemEnviada', (event) => {
-                        console.log('Mensagem recebida:', event.mensagem);
-                        this.mensagens.push(event.mensagem);
-                    });
             } catch (error) {
                 console.error('Erro ao buscar mensagens:', error);
             }
         },
+
         async mandarMensagem() {
             if (!this.chatSelecionado) {
                 console.error('Nenhum chat selecionado.');
@@ -103,14 +108,34 @@ export default {
     },
     mounted() {
         this.fetchChats();
-        console.log(this.chats);
-        console.log(this.idServidor);
-        window.Echo.channel('chat.' + this.chatSelecionado)
-            .listen('MensagemEnviada', (event) => {
-                console.log('Mensagem recebida:', event.mensagem);
-                this.mensagens.push(event.mensagem);
-            });
     },
+    watch: {
+        mensagensRecebidas(newMensagens) {
+            console.log('entrou no new mensagens');
+
+            const ultimaMensagem = newMensagens[newMensagens.length - 1];
+            if (ultimaMensagem) {
+                console.log('Mensagens por chat atualizadas:', this.mensagensPorChat);
+
+                const chatId = ultimaMensagem.chat_id;
+                const chat = this.sortedChats.find(chat => chat.id === chatId);
+
+                if (chat) {
+                    console.log('encontrou o chat');
+                    chat.ultima_mensagem_em = ultimaMensagem.enviado_em;
+                    if(this.chatSelecionado != chatId)
+                        chat.visualizado_adm = 1;
+                    this.adicionarMensagem(ultimaMensagem);
+                }
+
+                // Chama a função adicionarMensagem com a última mensagem recebida
+            }
+
+            console.log('Mensagens por chat atualizadas:', this.mensagensPorChat);
+        },
+    }
+
+
 };
 </script>
 
@@ -122,7 +147,7 @@ export default {
             style="height: 100%; overflow-y: auto; background-color: rgba(17, 132, 174, 0.1); border-top-left-radius: 1.5rem; border-bottom-left-radius: 1.5rem;">
 
             <div>
-                <div v-for="chat in chats" :key="chat.id" @click="getMessage(chat)" class="card"
+                <div v-for="chat in sortedChats" :key="chat.id" @click="getMessage(chat)" class="card"
                     style="background-color: rgba(100, 100, 100, 0); width: 100%;">
                     <div class="card-body" style="padding-left: 2rem;">
                         <h3 class="card-title">{{ chat.assunto }}</h3>
@@ -160,8 +185,10 @@ export default {
                         <div class="message-content">
                             <!-- Rótulo acima da mensagem -->
                             <div style="color: #6adae9; font-weight: bold;">
-                                {{ mensagem.admin_id !== null ? 'Admin:' : 'Usuário:' }}
+                                {{ mensagem.admin_id !== null ? 'Admin' : (usuarioSelecionado ? usuarioSelecionado.name
+                                    : 'Usuário') }}
                             </div>
+
                             <span>{{ mensagem.mensagem }}</span>
                             <!-- Horário no canto inferior direito -->
                             <div style="display: block; text-align: right; color: #AAAAAA; font-size: 12px;">
@@ -177,7 +204,7 @@ export default {
                 <input class="form-control me-2 my-input" type="text" maxlength="255" v-model="novaMensagem"
                     placeholder="Digite sua mensagem">
                 <button @click="mandarMensagem()" class="btn btn-success col-1" :disabled="loading">
-                    <i class="ph ph-paper-plane-right"></i>
+                    <i style="rotate: 45deg;" class="fa-solid fa-location-arrow"></i>
                 </button>
             </div>
         </div>

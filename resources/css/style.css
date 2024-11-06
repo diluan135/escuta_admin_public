@@ -305,6 +305,13 @@ h2 {
     cursor: pointer;
 }
 
+.card.visualizado {
+    background-color: #2d2d2d; /* Cor de fundo para chats visualizados */
+    color: #ffffff; /* Cor do texto para chats visualizados */
+    /* Outras propriedades de estilo que você desejar */
+}
+
+
 .remove-btn {
     position: absolute;
     top: 50%;
@@ -410,4 +417,11 @@ h2 {
 
 ::-webkit-scrollbar-track {
     background-color: transparent;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active em versões <2.1.8 */ {
+    opacity: 0;
 }

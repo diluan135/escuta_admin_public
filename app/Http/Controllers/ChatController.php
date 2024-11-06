@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -55,5 +56,14 @@ class ChatController extends Controller
         $chat->update(['encerrado_em' => date('Y-m-d H:i:s')]);
 
         return response()->json('Chat fechado com sucesso', 200);
+    }
+
+    public function marcarVisualizado(Request $request){
+        $chat = Chat::find($request->input('chat_id'));
+        Log::info($chat);
+        $chat->update(['visualizado_adm' => 0]);
+        Log::info('após update: ' . $chat);
+
+        return response()->json('Chat visualizado com sucesso', 200);
     }
 }

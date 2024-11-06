@@ -9,6 +9,8 @@ import Fechado from './Fechado.vue';
 import Logout from './Logout.vue';
 import FAQ from './FAQ.vue';
 
+
+
 export default {
     components: { Barra },
     computed: {
@@ -37,6 +39,9 @@ export default {
     mounted() {
         this.setCurrentView('Painel');
         this.fetchChats();
+    },
+    created() {
+        
     },
     methods: {
         ...mapMutations(['setCurrentView']),

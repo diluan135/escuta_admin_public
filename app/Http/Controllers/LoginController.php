@@ -16,7 +16,7 @@ class LoginController extends Controller
     }
 
     public function get(Request $request){
-        $usuarios = Usuario::get(['name', 'sobrenome', 'email', 'CPF', 'created_at']);
+        $usuarios = Usuario::get(['id', 'name', 'sobrenome', 'email', 'CPF', 'created_at']);
 
         return response()->json($usuarios);
     }

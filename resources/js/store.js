@@ -1,10 +1,23 @@
 import axios from './axiosConfig.js';
 import { createStore } from 'vuex';
+import Echo from "laravel-echo";
+import Pusher from "pusher-js";
 
-export default createStore({
+// Configuração do Pusher e Echo
+window.Pusher = Pusher;
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: '1fe0e6a95d21d4229441', // Use import.meta.env para acessar variáveis de ambiente no Vite
+    cluster: 'mt1',
+    forceTLS: 'true',
+    disableStats: true,
+    enabledTransports: ['ws'], // Use WebSocket
+});
+
+const store = createStore({
     state() {
         return {
-            loading: true, // Adiciona a propriedade `loading`
+            loading: true,
             currentView: 'novaSolicitacao',
             user: null,
             chats: [],
@@ -13,6 +26,7 @@ export default createStore({
             enquetes: [],
             faq: [],
             usuarios: [],
+            mensagensRecebidas: [],
         };
     },
     mutations: {
@@ -37,17 +51,35 @@ export default createStore({
         setFAQ(state, faq) {
             state.faq = faq;
         },
-        setUsuarios(state, usuarios){
+        setUsuarios(state, usuarios) {
             state.usuarios = usuarios;
-        }
+        },
+        setMensagensRecebidas(state, mensagensRecebidas) {
+            console.log('setMensagensRecebidas chamada:', mensagensRecebidas);
+            state.mensagensRecebidas = mensagensRecebidas;
+        },
+        adicionarMensagem(state, evento) {
+            const chatId = evento.chat_id;
+            const chat = state.chatsAbertos.find(c => c.id === chatId);
+
+            if (chat) {
+                chat.mensagens = chat.mensagens || [];
+                chat.mensagens.push(evento.mensagem);
+                console.log('Mensagem adicionada ao chat:', chat);
+
+                // Adiciona a mensagem à lista de mensagens recebidas
+                state.mensagensRecebidas.push(evento);
+                state.mensagensRecebidas = [...state.mensagensRecebidas];
+            } else {
+                console.warn(`Chat com ID ${chatId} não encontrado nos chats abertos.`);
+            }
+        },
     },
     actions: {
         async fetchData({ commit, dispatch }) {
-            // Inicia o estado de carregamento
             commit('setLoading', true);
 
-            // Dispara todas as ações de fetch em paralelo
-            Promise.all([
+            await Promise.all([
                 dispatch('fetchChats'),
                 dispatch('fetchChatsAbertos'),
                 dispatch('fetchChatsFechados'),
@@ -56,10 +88,9 @@ export default createStore({
                 dispatch('fetchUsuarios'),
             ]);
 
-            // Finaliza o estado de carregamento
             commit('setLoading', false);
         },
-        async fetchChats({ commit }) {            
+        async fetchChats({ commit }) {
             try {
                 const response = await axios.get('/api/chat');
                 commit('setChats', response.data);
@@ -67,9 +98,7 @@ export default createStore({
                 console.error('Failed to fetch chats', error);
             }
         },
-        async fetchChatsAbertos({ commit }) {            
-
-            
+        async fetchChatsAbertos({ commit }) {
             try {
                 const response = await axios.get('/api/chat/abertos');
                 commit('setChatsAbertos', response.data);
@@ -77,8 +106,7 @@ export default createStore({
                 console.error('Failed to fetch chats abertos', error);
             }
         },
-        async fetchChatsFechados({ commit }) {            
-
+        async fetchChatsFechados({ commit }) {
             try {
                 const response = await axios.get('/api/chat/fechados');
                 commit('setChatsFechados', response.data);
@@ -87,7 +115,6 @@ export default createStore({
             }
         },
         async fetchEnquetes({ commit }) {
-
             try {
                 const response = await axios.get('/api/enquetes');
                 commit('setEnquetes', response.data);
@@ -97,21 +124,43 @@ export default createStore({
         },
         async fetchFAQ({ commit }) {
             try {
-                const response = await axios.get('/api/FAQ'); // Ajuste o endpoint conforme necessário
+                const response = await axios.get('/api/FAQ');
                 commit('setFAQ', response.data);
-                // console.log(response)
             } catch (error) {
                 console.error('Failed to fetch FAQ', error);
             }
         },
         async fetchUsuarios({ commit }) {
             try {
-                const response = await axios.get('/api/usuario/get'); // Ajuste o endpoint conforme necessário
+                const response = await axios.get('/api/usuario/get');
                 commit('setUsuarios', response.data);
-                // console.log(response)
             } catch (error) {
-                console.error('Failed to fetch FAQ', error);
+                console.error('Failed to fetch usuarios', error);
+            }
+        },
+        initListener({ dispatch }) {
+            console.log('Echo instance:', window.Echo);
+            window.Echo.channel('escuta')
+                .listen('.escuta', (event) => {
+                    console.log('Mensagem recebida:', event);
+                    dispatch('handleIncomingMessage', event.message);
+                });
+        },
+        handleIncomingMessage({ commit, state, dispatch }, evento) {
+            const chatId = evento.chat_id;
+            const chat = state.chatsAbertos.find(c => c.id === chatId);
+
+            if (chat) {
+                commit('adicionarMensagem', evento);
+            } else {
+                console.warn(`Chat com ID ${chatId} não encontrado nos chats abertos. Recarregando chats...`);
+                dispatch('fetchChats');
             }
         },
     },
 });
+
+// Inicia o listener ao criar a store
+store.dispatch('initListener');
+
+export default store;

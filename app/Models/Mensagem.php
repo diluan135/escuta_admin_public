@@ -14,9 +14,10 @@ class Mensagem extends Model
         'chat_id',
         'admin_id',
         'mensagem',
+        'visualizado'
     ];
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     const CREATED_AT = 'enviado_em';
 

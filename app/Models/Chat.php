@@ -10,7 +10,7 @@ class Chat extends Model
     protected $table = 'chat';
 
     protected $fillable = [
-        'usuario_id', 'tipo', 'assunto', 'linha', 'encerrado_em', 'chat_status'
+        'usuario_id', 'tipo', 'assunto', 'linha', 'encerrado_em', 'chat_status', 'ultima_mensagem_em',  'visualizado_adm',
     ];
 
     public $timestamps = false;

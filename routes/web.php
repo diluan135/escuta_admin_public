@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\MyEvent;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EnqueteController;
 use App\Http\Controllers\HomeController;
@@ -24,7 +25,7 @@ Route::middleware(['web'])->post('/test', function (Request $request) {
 
 Route::post('/api/teste-conexao', function (Request $request) {
     $mensagem = $request->input('mensagem', 'Mensagem padrão');
-    event(new TesteDeConexao($mensagem));
+    event(new MyEvent($mensagem));
     return response()->json(['status' => 'Evento de conexão enviado']);
 });
 
@@ -49,6 +50,7 @@ Route::get('/api/chat/abertos', [ChatController::class, 'aberto']);
 Route::get('/api/chat/fechados', [ChatController::class, 'fechado']);
 Route::post('/api/chat/newChat', [ChatController::class, 'newChat']);
 Route::post('/api/chat/fecharChat', [ChatController::class, 'fecharChat']);
+Route::post('/api/chat/visualizar', [ChatController::class, 'marcarVisualizado']);
 
 Route::post('/api/mensagem/enviarMensagem', [MensagemController::class, 'enviarMensagem']);
 Route::get('/api/mensagem', [MensagemController::class, 'index']);

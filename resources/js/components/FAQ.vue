@@ -2,165 +2,90 @@
 import { mapState, mapActions } from 'vuex';
 import axios from 'axios';
 
-
 export default {
     data() {
         return {
-            faqChats: [], // Armazena os chats do FAQ
-            mensagensFAQ: [], // Armazena as mensagens do FAQ
-            chatSelecionado: null,
-            chatPublicado: null,
-            chatPublicadoTemp: null,
-            chatTipo: null,
-            chatAssunto: null,
-            chatLinha: null,
-            loading: false,
-            editarMensagens: false, // Controle do modo de edição
-            editarTituloAtivo: false, // Controle do modo de edição do título
-            novoTitulo: '', // Armazena o novo título durante a edição
-            publicarStatus: [], // Armazena o status de publicação das mensagens
-            avisoPublicar: false, // Aviso para verificar as mensagens antes de publicar
-            loadingstats: 0,
+            titulo: '',
+            descricao: '',
+            editarId: null,
+            editarTitulo: '',
+            editarDescricao: '',
+            isPublicado: true, // Variável para controle de publicação
         };
     },
     computed: {
-        ...mapState(['faq', 'user']),
         idServidor() {
             return window.idServidor;
-        }
+        },
+        ...mapState({
+            faq: state => state.faq
+        })
     },
     methods: {
         ...mapActions(['fetchFAQ']),
-        async getMensagensFAQ(chat) {
-            this.chatSelecionado = 0;
-            this.editarMensagens = false;
-            this.avisoPublicar = false;
-            this.loadingstats = 1;
+
+        async adicionarFAQ() {
             try {
-                const response = await axios.get('/api/FAQ/mensagensPublicadas', {
-                    params: { chat_id: chat.id }
+                const response = await axios.post('/api/FAQ/criarFAQ', {
+                    'idServidor': this.idServidor,
+                    'titulo': this.titulo,
+                    'descricao': this.descricao
                 });
-                this.mensagensFAQ = response.data;
-                this.chatSelecionado = chat.id;
-                this.chatPublicado = chat.publicado;
-                this.chatTipo = chat.tipo;
-                this.chatAssunto = chat.assunto;
-                this.chatLinha = chat.linha;
-                this.publicarStatus = this.mensagensFAQ.map(() => true); // Inicializa com todas as mensagens publicáveis
-                this.loadingstats = 0;
+                this.titulo = '';
+                this.descricao = '';
+                this.fetchFAQ();
+                console.log(response.data);
             } catch (error) {
-                console.error('Erro ao obter mensagens do FAQ:', error);
+                console.error('Failed to fetch FAQ', error);
             }
         },
-        modoPublicarChat() {
-            if (!this.chatSelecionado) {
-                console.error('Nenhum chat selecionado.');
-                return;
-            }
-            this.avisoPublicar = true;
-            this.editarMensagens = true; // Ativa o modo de edição
+
+        // Editar FAQ
+        editarFAQ(id, titulo, descricao) {
+            this.editarId = id;
+            this.editarTitulo = titulo;
+            this.editarDescricao = descricao;
         },
-        editarTitulo() {
-            // Ativa o modo de edição e preenche o campo de input com o título atual
-            this.editarTituloAtivo = true;
-            this.novoTitulo = this.chatAssunto;
-        },
-        async salvarTitulo() {
-            if (!this.novoTitulo || this.novoTitulo.trim() === '' || this.novoTitulo.length < 3) {
-                alert('O título deve ter pelo menos 3 caracteres.');
-                return;
-            }
 
-            // Se o título for válido, atualiza o título localmente e envia ao backend
-            if (this.novoTitulo !== this.chatAssunto) {
-                this.chatAssunto = this.novoTitulo; // Atualiza o título localmente
-
-                await axios.post('/api/FAQ/editarTitulo', {
-                    chat_id: this.chatSelecionado,
-                    novo_titulo: this.novoTitulo
-                })
-                    .then(response => {
-                        // console.log('Título atualizado com sucesso:', response.data.message);
-                    })
-                    .catch(error => {
-                        console.error('Erro ao atualizar o título:', error);
-                    });
-            }
-            this.editarTituloAtivo = false; // Desativa o modo de edição do título
-            this.fetchFAQ();
-            // davi coloque um balãozinho com notificação que deu certo a alteração do título aqui:
-
-
-        },
-        cancelarEdicaoTitulo() {
-            this.editarTituloAtivo = false; // Desativa o modo de edição sem salvar
-            this.novoTitulo = ''; // Limpa o campo de input
-        },
-        async publicarMensagensFAQ() {
-            if (!this.chatSelecionado) {
-                console.error('Nenhum chat selecionado.');
-                return;
-            }
-
-            if ((this.chatPublicado == 1 && this.chatPublicadoTemp == false) || (this.chatPublicado == 0 && this.chatPublicadoTemp == true)) {
-                try {
-                    if (this.chatPublicadoTemp) {
-                        await axios.post('/api/FAQ/ativarChat', {
-                            chat_id: this.chatSelecionado
-                        });
-                    } else {
-                        await axios.post('/api/FAQ/desativarChat', {
-                            chat_id: this.chatSelecionado
-                        });
-                    }
-                    await this.$store.dispatch('fetchFAQ');
-                } catch (error) {
-                    console.error('Erro ao atualizar o status do chat:', error);
-                }
-
-            }
-
-            this.loading = true;
-
-            const mensagensPublicaveis = this.mensagensFAQ.map((mensagem, index) => ({
-                id: mensagem.id,
-                mensagem: mensagem.mensagem,
-                chatPublicado_id: this.chatSelecionado,
-                publicado: this.publicarStatus[index] ? 1 : 0,
-            }));
-
+        // Salvar FAQ editada
+        async salvarFAQ() {
             try {
-                const response = await axios.post('/api/FAQ/atualizarMensagens', {
-                    tipo: this.chatTipo,
-                    assunto: this.chatAssunto,
-                    linha: this.chatLinha,
-                    mensagens: mensagensPublicaveis,
-                    chat_id: this.chatSelecionado,
+                const response = await axios.put(`/api/FAQ/atualizarFAQ/${this.editarId}`, {
+                    'titulo': this.editarTitulo,
+                    'descricao': this.editarDescricao,
+                    'publicado': this.isPublicado,
                 });
+                this.fetchFAQ();
+                this.editarId = null;  // Limpa o campo de edição
+                console.log(response.data);
             } catch (error) {
-                if (error.response && error.response.status === 400) {
-                    console.error('Erro:', error.response.data.message);
-                    alert(error.response.data.message); // Exibe a mensagem de erro para o usuário
-                } else {
-                    console.error('Erro ao publicar mensagens do FAQ:', error);
-                }
-            } finally {
-                this.loading = false;
-                this.editarMensagens = false; // Desativa o modo de edição
-                this.avisoPublicar = false;
+                console.error('Failed to update FAQ', error);
             }
-            await this.$store.dispatch('fetchFAQ');
-            this.editarMensagens = false;
-            this.chatSelecionado = null;
-            this.getMensagensFAQ(this.chatSelecionado);
-
-            // davi coloque um balãozinho com notificação que deu certo a alteração das mensagens aqui:
-
         },
-        cancelarPublicarChat() {
-            this.avisoPublicar = false;
-            this.editarMensagens = false; // Desativa o modo de edição
+
+        // Publicar ou despublicar FAQ
+        async togglePublicacao(faqId) {
+            try {
+                const resposta = await axios.put(`/api/FAQ/alterarStatus/${faqId}`, {
+                    'publicado': this.isPublicado ? 1 : 0
+                });
+                this.fetchFAQ();
+                console.log(resposta.data);
+            } catch (error) {
+                console.error('Failed to change FAQ status', error);
+            }
         },
+
+        // Excluir FAQ
+        async excluirFAQ(faqId) {
+            try {
+                const resposta = await axios.delete(`/api/FAQ/excluirFAQ/${faqId}`);
+                this.fetchFAQ();
+                console.log(resposta.data);
+            } catch (error) {
+                console.error('Failed to delete FAQ', error);
+            }
+        }
     },
     mounted() {
         this.fetchFAQ();
@@ -169,104 +94,92 @@ export default {
 </script>
 
 <template>
-    <div class="d-flex">
-        <!-- Lista de Chats do FAQ -->
-        <div class="col-4 p-4 border-end" style="height: calc(100vh - 3.5rem); background-color: rgba(0, 0, 0, 0.7);">
-            <h1 class="mb-4">FAQ</h1>
-            <div class="d-flex flex-column justify-content-start gap-3" style="height: 85%; overflow-y: auto;">
-                <div v-for="chat in faq" :key="chat.id" class="card" @click="getMensagensFAQ(chat)"
-                    style="background-color: rgba(0, 0, 0, 0.5); width: 95%;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ chat.assunto }}</h5>
-                        <p class="card-text">
-                            <strong>Criado em:</strong> {{ chat.criado_em }}<br>
-                            <span v-if="chat.linha"><strong>Linha:</strong> {{ chat.linha }}</span><br>
-                            <span v-if="chat.publicado == 1" class="badge bg-success mb-4">Publicado</span>
-                        </p>
-                        <!-- <button @click="getMensagensFAQ(chat)" class="btn btn-primary">Acessar mensagens do FAQ</button> -->
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div style="padding-left:4%; padding-right: 4%; padding-top: 2%; overflow-y: auto; height: calc(100vh - 5rem);">
+        <div class="row" style="">
 
-        <!-- Mensagens do FAQ -->
-        <div v-if="chatSelecionado" class="col-8 d-flex flex-column p-3"
-            style="height: calc(100vh - 3.5rem); width: calc(66.66%); background-color: rgba(0, 0, 0, 0.7);">
-            <div v-if="avisoPublicar" class="alert alert-warning">
-                Não esqueça de retirar/alterar possíveis identificadores sobre as pessoas e/ou palavras erradas e de
-                baixo calão!
-            </div>
-
-            <!-- Edição de Título -->
-            <div v-else>
-                <div class="d-flex justify-content-between align-items-center mb-3" v-if="!editarTituloAtivo">
-                    <h2 class="text-white">{{ chatAssunto }}</h2>
-                    <div>
-                        <button class="btn btn-secondary me-2" @click="editarTitulo">Editar título</button>
-                        <button class="btn btn-info" @click="modoPublicarChat()" :disabled="loading">Editar
-                            chat</button>
-                    </div>
-                </div>
-                <div v-else class="d-flex">
-                    <input v-model="novoTitulo" class="form-control me-2" placeholder="Digite o novo título">
-                    <button class="btn btn-success me-2" @click="salvarTitulo">Salvar</button>
-                    <button class="btn btn-danger" @click="cancelarEdicaoTitulo">Cancelar</button>
+            <!-- ----------------------------------- ADICIONAR FAQ --------------------------------------- -->
+            <div class="row" style=" color:white; margin-bottom: 4vh;">
+                <div style="margin-right:2vw; height: auto;" class="col templateBox">
+                    <h2 style="padding-left:1vw; padding-top: 2vh; margin-bottom: 2vh;">Adicionar FAQ</h2>
+                    <input type="text" v-model="titulo" placeholder="Título" class="my-input">
+                    <textarea v-model="descricao" placeholder="Descrição..." class="my-input"
+                        style="height: 5rem; resize: none; margin-top: 10px;"></textarea>
+                    <button class="btn btn-success col-1" @click="adicionarFAQ">Adicionar</button>
                 </div>
             </div>
 
-            <!-- Lista de Mensagens -->
-            <div class="chat-messages flex-grow-1 overflow-auto d-flex flex-column mt-4">
-                <div v-if="!editarMensagens">
-                    <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id"
-                        class="alert alert-secondary text-white mb-3">
-                        <div v-if="mensagem.admin_id" class="d-flex justify-content-between">
-                            <span><strong>Admin {{ mensagem.admin_id }}:</strong> {{ mensagem.mensagem }}</span>
-                            <span><strong>{{ mensagem.publicado ? 'Publicado' : 'Não publicado' }}</strong></span>
+            <!-- ----------------------------------- LISTAR FAQ --------------------------------------- -->
+            <div class="row" style=" color:white; margin-bottom: 4vh;">
+                <div style="margin-right:2vw; height: auto;" class="col templateBox">
+                    <h2 style="padding-left:1vw; padding-top: 2vh; margin-bottom: 2vh;">FAQ's criadas</h2>
+                    <div v-for="faq in faq" :key="faq.id">
+                        <div class="row faq-item">
+                            <h5 class="col" style="padding-left:1vw; padding-top: 2vh; margin-bottom: 2vh;">{{
+                                faq.titulo }}</h5>
+                            <button class="col" @click="faq.show = !faq.show">Ver</button>
                         </div>
-                        <div v-else class="d-flex justify-content-between">
-                            <span><strong>Usuário:</strong> {{ mensagem.mensagem }}</span>
-                            <span><strong>{{ mensagem.publicado ? 'Publicado' : 'Não publicado' }}</strong></span>
+                        <div class="row">
+                            <p class="col" v-if="faq.show"
+                                style="padding-left:1vw; padding-top: 2vh; margin-bottom: 2vh;">
+                                {{ faq.descricao }}
+                            </p>
+                            <div class="col" v-if="faq.show">
+                                <!-- Editar e Publicar/Despublicar -->
+                                <button class="btn btn-warning" @click="editarFAQ(faq.id, faq.titulo, faq.descricao)">
+                                    Editar
+                                </button>
+                                <button class="btn btn-info" @click="togglePublicacao(faq.id)">
+                                    {{ faq.publicado === 1 ? 'Despublicar' : 'Publicar' }}
+                                </button>
+                                <button class="btn btn-danger" @click="excluirFAQ(faq.id)">Excluir</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Modo de Edição das Mensagens -->
-                <div v-else>
-                    <label class="form-check mb-3">
-                        <input type="checkbox" :checked="chatPublicado == 1" class="form-check-input"
-                            @change="chatPublicadoTemp = !chatPublicadoTemp">
-                        <span class="form-check-label">Chat publicado?</span>
-                    </label>
-
-                    <div v-for="(mensagem, index) in mensagensFAQ" :key="mensagem.id" class="alert alert-dark mb-3">
-                        <input v-model="mensagem.mensagem" class="form-control mb-2" />
-                        <label class="form-check">
-                            <input type="checkbox" :checked="mensagem.publicado == 1" v-model="publicarStatus[index]"
-                                class="form-check-input" />
-                            <span class="form-check-label">Publicar</span>
-                        </label>
-                    </div>
-                </div>
             </div>
 
-            <!-- Botões de Ação -->
-            <div v-if="editarMensagens" class="d-flex justify-content-end mt-3">
-                <button @click="cancelarPublicarChat()" class="btn btn-danger me-2"
-                    :disabled="loading">Cancelar</button>
-                <button @click="publicarMensagensFAQ()" class="btn btn-success" :disabled="loading">Salvar
-                    alterações</button>
-            </div>
-        </div>
-
-        <!-- Placeholder quando nenhum chat está selecionado -->
-        <div v-else class="col-8 d-flex align-items-center justify-content-center"
-            style="background-color: rgba(0, 0, 0, 0.7); border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem; height: 100vh;">
-            <div class="text-center">
-                <h1 v-if="this.loadingstats == 0" class="text-white">Acesse um chat para visualizá-lo.</h1>
-                <div v-if="this.loadingstats == 1" class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+            <!-- --------------------------- Modal de Edição --------------------------- -->
+            <div v-if="editarId" class="modal">
+                <div class="modal-content">
+                    <h3>Editar FAQ</h3>
+                    <input v-model="editarTitulo" placeholder="Título" class="my-input">
+                    <textarea v-model="editarDescricao" placeholder="Descrição" class="my-input"
+                        style="height: 5rem; resize: none; margin-top: 10px;"></textarea>
+                    <button class="btn btn-primary" @click="salvarFAQ">Salvar</button>
+                    <button class="btn btn-secondary" @click="editarId = null">Cancelar</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+.faq-item {
+    margin-bottom: 2vh;
+    padding-left: 1vw;
+}
+
+.faq-item button {
+    margin-right: 1vw;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 100%;
+}
+</style>

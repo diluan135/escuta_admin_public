@@ -98,7 +98,7 @@ const store = createStore({
         },
         async fetchChatsAbertos({ commit }) {
             try {
-                const response = await axios.get('/api/chat/abertos');
+                const response = await axios.get('/api/chat/abertos');                
                 commit('setChatsAbertos', response.data);
             } catch (error) {
                 console.error('Failed to fetch chats abertos', error);
@@ -123,6 +123,7 @@ const store = createStore({
         async fetchFAQ({ commit }) {
             try {
                 const response = await axios.get('/api/FAQ');
+                console.log(response.data);
                 commit('setFAQ', response.data);
             } catch (error) {
                 console.error('Failed to fetch FAQ', error);

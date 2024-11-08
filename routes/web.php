@@ -58,13 +58,10 @@ Route::get('/api/mensagem', [MensagemController::class, 'index']);
 
 // ------------------------------------------- ROTAS DE FAQ -----------------------------------------------------
 
-Route::get('/api/FAQ', [FAQController::class, 'index']);
-Route::get('/api/FAQ/mensagensPublicadas', [FAQController::class, 'getMensagensPublicadas']);
+Route::get('api/FAQ', [FAQController::class, 'index']);
+Route::post('api/FAQ/criarFAQ', [FAQController::class, 'criarFAQ']);
+Route::get('api/FAQ/listarFAQ', [FAQController::class, 'listarFAQ']);
+Route::put('api/FAQ/atualizarFAQ/{id}', [FAQController::class, 'atualizarFAQ']);
+Route::put('api/FAQ/alterarStatus/{id}', [FAQController::class, 'alterarStatus']);
+Route::delete('api/FAQ/excluirFAQ/{id}', [FAQController::class, 'excluirFAQ']);
 
-Route::post('/api/FAQ/publicarChat', [FAQController::class, 'publicarChat']);
-Route::post('/api/FAQ/ativarChat', [FAQController::class, 'ativarChat']);
-Route::post('/api/FAQ/desativarChat', [FAQController::class, 'desativarChat']);
-
-Route::post('/api/FAQ/editarTitulo', [FAQController::class, 'atualizarTitulo']);
-
-Route::post('api/FAQ/atualizarMensagens', [FAQController::class, 'atualizarMensagens']);

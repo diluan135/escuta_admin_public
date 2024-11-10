@@ -54,7 +54,10 @@ export default {
                         await this.$store.dispatch('fetchEnquetes');
                         this.titulo = '';
                         this.descricao = '';
-                        this.opcoes = [];
+                        this.opcoes = [
+                            { texto: '', cor: '#6adae9' },
+                            { texto: '', cor: '#6adae9' }
+                        ]
                         this.numOpcoes = 1;
                         this.encerra_em = new Date().toISOString().slice(0, 16); // Resetando para o formato correto
                         this.loadingstats = 0;
@@ -155,8 +158,9 @@ export default {
 
                 </div>
                 <div class="modal-footer">
-                    <button @click="criarEnquete" class="botao azul ms-auto" data-bs-dismiss="modal" style="margin-right: 0.7rem;">{{
-                        this.loadingstats ? 'Criando...' : 'Criar' }}</button>
+                    <button @click="criarEnquete" class="botao azul ms-auto" data-bs-dismiss="modal"
+                        style="margin-right: 0.7rem;">{{
+                            this.loadingstats ? 'Criando...' : 'Criar' }}</button>
                 </div>
             </div>
         </div>

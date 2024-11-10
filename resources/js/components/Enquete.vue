@@ -22,6 +22,7 @@ export default {
 
             if (this.titulo == '' || this.titulo == null) {
                 alert('O título não pode estar vazio.');
+                this.loadingstats = 0;
                 return;
             } else {
                 const opcoesValidas = this.opcoes.every(opcao => opcao.texto && opcao.texto.trim() !== '');
@@ -57,13 +58,10 @@ export default {
                         this.numOpcoes = 1;
                         this.encerra_em = new Date().toISOString().slice(0, 16); // Resetando para o formato correto
                         this.loadingstats = 0;
-                        alert('Enquete criada com sucesso!')
+                        alert('Enquete criada com sucesso!');
                     }
                 }
             }
-
-
-
         },
         adicionarOpcao() {
             this.opcoes.push({ texto: '', cor: '#ffffff' });
@@ -124,8 +122,42 @@ export default {
 
             <div class="d-flex flex-row justify-content-between">
                 <button @click="adicionarOpcao" class="btn btn-link p-0">Adicionar opção</button>
-                <button @click="criarEnquete" class="botao azul ms-auto" style="margin-right: 0.7rem;">{{
-                    this.loadingstats ? 'Criando...' : 'Criar' }}</button>
+                <button class="botao azul ms-auto" style="margin-right: 0.7rem;" data-bs-toggle="modal"
+                    data-bs-target="#viewModal">
+                    {{ loadingstats ? 'Criando...' : 'Ver modelo' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewModalLabel">Modelo de Enquete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container" style="border: 1px solid #d3d3d3; border-radius: 8px; padding: 20px;">
+                        <h5>{{ titulo }}</h5>
+                        <p>{{ descricao }}</p>
+
+                        <div class="row g-2 justify-content-center">
+                            <div v-for="(opcao, index) in opcoes" :key="index"
+                                class="col-6 col-md-4 d-flex justify-content-center">
+                                <button class="btn w-100 text-white p-3"
+                                    :style="{ backgroundColor: opcao.cor || '#3994cc' }">
+                                    {{ opcao.texto || `Opção #${index + 1}` }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button @click="criarEnquete" class="botao azul ms-auto" data-bs-dismiss="modal" style="margin-right: 0.7rem;">{{
+                        this.loadingstats ? 'Criando...' : 'Criar' }}</button>
+                </div>
             </div>
         </div>
     </div>

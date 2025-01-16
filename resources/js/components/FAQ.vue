@@ -104,7 +104,7 @@ export default {
                     <input type="text" v-model="titulo" placeholder="Título" class="my-input">
                     <textarea v-model="descricao" placeholder="Descrição..." class="my-input"
                         style="height: 5rem; resize: none; margin-top: 10px;"></textarea>
-                    <button class="btn btn-success col-1" @click="adicionarFAQ">Adicionar</button>
+                    <button class="btn btn-success col-1" style="margin: 5px 0px 10px 10px;" @click="adicionarFAQ">Adicionar</button>
                 </div>
             </div>
 
@@ -116,20 +116,21 @@ export default {
                         <div class="row faq-item">
                             <h5 class="col" style="padding-left:1vw; padding-top: 2vh; margin-bottom: 2vh;">{{
                                 faq.titulo }}</h5>
-                            <button class="col" @click="faq.show = !faq.show">Ver</button>
+                            <button class="col btn btn-info" @click="faq.show = !faq.show">Ver</button>
                         </div>
                         <div class="row">
                             <p class="col" v-if="faq.show"
                                 style="padding-left:1vw; padding-top: 2vh; margin-bottom: 2vh;">
                                 {{ faq.descricao }}
                             </p>
-                            <div class="col" v-if="faq.show">
+                            <div class="col-2 btn-group align-self-start" v-if="faq.show">
                                 <!-- Editar e Publicar/Despublicar -->
                                 <button class="btn btn-warning" @click="editarFAQ(faq.id, faq.titulo, faq.descricao)">
                                     Editar
                                 </button>
                                 <button class="btn btn-info" @click="togglePublicacao(faq.id)">
-                                    {{ faq.publicado === 1 ? 'Despublicar' : 'Publicar' }}
+                                    {{ faq.publicar === 1 ? 'Despublicar' : 'Publicar' }}
+                                    <!-- {{ faq }} -->
                                 </button>
                                 <button class="btn btn-danger" @click="excluirFAQ(faq.id)">Excluir</button>
                             </div>

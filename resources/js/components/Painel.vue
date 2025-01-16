@@ -208,6 +208,7 @@ export default {
             el.style.opacity = 1;
             el.style.maxHeight = el.scrollHeight + 'px';
         },
+
         leave(el) {
             el.style.opacity = 0;
             el.style.maxHeight = '0';

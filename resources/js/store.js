@@ -7,7 +7,7 @@ import Pusher from "pusher-js";
 window.Pusher = Pusher;
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: '1fe0e6a95d21d4229441', // Use import.meta.env para acessar variáveis de ambiente no Vite
+    key: import.meta.env, // Use para acessar variáveis de ambiente no Vite
     cluster: 'mt1',
     forceTLS: 'true',
     disableStats: true,

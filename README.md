@@ -1,66 +1,95 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Real-Time Chat System / Sistema de Chat em Tempo Real
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is a project developed using the **Laravel** framework on the backend and **Vue.js** on the frontend. It uses several libraries, including Vue Router, Vite, Vuex, Laravel Echo, and Axios to provide a real-time chat experience, user management, and ticket sales for events.
 
-## About Laravel
+Este é um projeto desenvolvido utilizando o framework **Laravel** no backend e **Vue.js** no frontend. Ele faz uso de várias bibliotecas, incluindo Vue Router, Vite, Vuex, Laravel Echo, e Axios para fornecer uma experiência de chat em tempo real, gerenciamento de usuários e vendas de ingressos para eventos.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Technologies Used / Tecnologias Utilizadas
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Backend**: Laravel (PHP)
+- **Frontend**: Vue.js, Vite, Vue Router, Vuex
+- **Real-Time Chat**: Laravel Echo, Pusher
+- **Database**: MySQL
+- **Notifications**: Laravel Notifications (for received messages notification)
+- **Authentication and Security**: Laravel Passport (for API authentication), Password Hashing
+- **Email Sending**: Laravel Mail (for account recovery and creation via email)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend**: Laravel (PHP)
+- **Frontend**: Vue.js, Vite, Vue Router, Vuex
+- **Chat em Tempo Real**: Laravel Echo, Pusher
+- **Banco de Dados**: MySQL
+- **Notificações**: Laravel Notifications (para notificação de mensagens recebidas)
+- **Autenticação e Segurança**: Laravel Passport (para autenticação via API), Hash de Senhas
+- **Envio de E-mails**: Laravel Mail (para recuperação de conta e criação de conta via e-mail)
 
-## Learning Laravel
+## Features / Funcionalidades
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. **Account Management / Gerenciamento de Conta**
+- Account creation via email.
+- Account recovery with email sending.
+- Passwords stored securely (hashed).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 1. **Gerenciamento de Conta**
+- Sistema de criação de conta via e-mail.
+- Recuperação de conta com envio de e-mail.
+- Senhas armazenadas de forma segura (hash).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. **Real-Time Chat / Chat em Tempo Real**
+- Communication between users and administrators in real time using **Laravel Echo** and **Pusher**.
+- Notification of new received messages.
 
-## Laravel Sponsors
+### 2. **Chat em Tempo Real**
+- Comunicação entre usuário e administrador em tempo real utilizando **Laravel Echo** e **Pusher**.
+- Notificação de novas mensagens recebidas.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. **Poll and FAQ Creation / Criação de Enquetes e FAQs**
+- Administrators can create polls and FAQs for user interaction.
 
-### Premium Partners
+### 3. **Criação de Enquetes e FAQs**
+- Os administradores podem criar enquetes e FAQs para interação com os usuários.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 4. **Voting System / Sistema de Votação**
+- Users can vote in polls created by administrators.
 
-## Contributing
+### 4. **Sistema de Votação**
+- Usuários podem votar em enquetes criadas pelos administradores.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 5. **Control Dashboard / Dashboard de Controle**
+- Administrators have access to a BI with information from various request types.
 
-## Code of Conduct
+### 5. **Dashboard de controle**
+- Administradores têm acesso a um BI com informações de diferentes tipos de solicitações.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Installation / Instalação
 
-## Security Vulnerabilities
+### Backend (Laravel) / Backend (Laravel)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Clone the repository / Clone o repositório:
 
-## License
+   ```bash
+   git clone https://github.com/diluan135/escuta_admin_public.git
+   composer install
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+2. Access the cloned repository / Acesse o repositório onde foi clonado
+
+3. Install the dependencies / Instale as dependências:
+    composer install
+
+4. Configure the .env file with your database, Pusher, and email settings / Configure o .env corretamente com seu BD, PUSHER e EMAIL
+
+5. Generate the application key and run the migrations / Gere a chave da aplicação e rode as migrações:
+
+    php artisan key:generate
+    php artisan migrate
+   
+6. Start the server / Inicie o servidor:
+
+    php artisan serve
+
+7. Install the frontend dependencies / Instale as dependências frontend:
+
+   npm install
+
+8. Compile the files / Compile os arquivos:
+
+   npm run dev

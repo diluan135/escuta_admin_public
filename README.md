@@ -73,23 +73,29 @@ Este é um projeto desenvolvido utilizando o framework **Laravel** no backend e 
 2. Access the cloned repository / Acesse o repositório onde foi clonado
 
 3. Install the dependencies / Instale as dependências:
+
+      ```bash
     composer install
 
-4. Configure the .env file with your database, Pusher, and email settings / Configure o .env corretamente com seu BD, PUSHER e EMAIL
+5. Configure the .env file with your database, Pusher, and email settings / Configure o .env corretamente com seu BD, PUSHER e EMAIL
 
-5. Generate the application key and run the migrations / Gere a chave da aplicação e rode as migrações:
+6. Generate the application key and run the migrations / Gere a chave da aplicação e rode as migrações:
 
+      ```bash
     php artisan key:generate
     php artisan migrate
    
-6. Start the server / Inicie o servidor:
+7. Start the server / Inicie o servidor:
 
+      ```bash
     php artisan serve
 
-7. Install the frontend dependencies / Instale as dependências frontend:
+8. Install the frontend dependencies / Instale as dependências frontend:
 
+      ```bash
    npm install
 
-8. Compile the files / Compile os arquivos:
+9. Compile the files / Compile os arquivos:
 
+      ```bash
    npm run dev
